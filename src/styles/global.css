@@ -1,0 +1,61 @@
+/*
+ * Global styles + design token surface.
+ * Token values here mirror the Design Spec token groups
+ * (color / typography / spacing / radius). Components consume the
+ * CSS custom properties below rather than hardcoding raw values.
+ */
+:root {
+  /* color */
+  --color-bg-base: #f6f7f9;
+  --color-surface-default: #ffffff;
+  --color-text-primary: #1f2933;
+  --color-text-secondary: #6b7280;
+  --color-border-default: #e5e7eb;
+  --color-accent-primary: #2563eb;
+
+  /* typography */
+  --font-family-base: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic',
+    system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-size-sm: 14px;
+  --text-size-md: 16px;
+  --text-size-lg: 20px;
+  --text-size-xl: 28px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+
+  /* spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* radius */
+  --radius-md: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--text-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
