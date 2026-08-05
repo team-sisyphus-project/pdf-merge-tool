@@ -5,6 +5,7 @@ import Dropzone from './components/Dropzone'
 import PageGrid from './components/PageGrid'
 import { ThumbnailRenderer } from './core/thumbnail'
 import { mergePages } from './core/merge'
+import { extractPages } from './core/split'
 import { buildExportFilename, downloadPdf } from './core/download'
 import type { SourceFile, WorkspacePage } from './core/types'
 import { useSourceFiles } from './state/useSourceFiles'
@@ -54,13 +55,49 @@ export default function App() {
     [],
   )
 
+  // The checked pages in workspace order — filtering the ordered SSoT `pages`
+  // by the selection set preserves output order (design spec §4). This is the
+  // exact subset 선택 페이지 내보내기 assembles.
+  const selectedPages = useMemo(
+    () => pages.filter((page) => selected.has(page.id)),
+    [pages, selected],
+  )
+
+  // 선택 페이지 내보내기 (design spec §2, 추출): assemble only the checked pages
+  // into a single PDF via the pure `extractPages` core, then download. Mirrors
+  // `exportAll`'s split of concerns — this "how" lives here, the toolbar owns
+  // the "when". The file is named after the source document(s) the selection
+  // draws from, falling back to 선택페이지 when no source name is usable. Rejects
+  // propagate so the toolbar can surface the inline error.
+  const exportSelected = useCallback(
+    async (pagesToExport: WorkspacePage[], files: SourceFile[]) => {
+      const bytes = await extractPages(pagesToExport, files)
+      const nameById = new Map(files.map((file) => [file.id, file.name]))
+      // Distinct origin file names in first-seen order; blanks are skipped so
+      // buildExportFilename applies the 선택페이지 fallback when none remain.
+      const sourceNames: string[] = []
+      const seen = new Set<string>()
+      for (const page of pagesToExport) {
+        if (seen.has(page.sourceFileId)) continue
+        seen.add(page.sourceFileId)
+        const name = nameById.get(page.sourceFileId)
+        if (name) sourceNames.push(name)
+      }
+      const filename = buildExportFilename(sourceNames, { fallback: '선택페이지' })
+      downloadPdf(bytes, filename)
+    },
+    [],
+  )
+
   return (
     <div className="app-shell">
       <AppHeader />
       <Toolbar
         pages={pages}
+        selectedPages={selectedPages}
         sourceFiles={sourceFiles}
         onExportAll={exportAll}
+        onExportSelected={exportSelected}
         selectedCount={selected.size}
       />
       <main className="workspace">

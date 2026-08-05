@@ -2,13 +2,14 @@
  * Workspace toolbar. Hosts the export actions (design spec §4) and the live
  * selection count.
  *
- * grain-2 wires the first action — `전체 내보내기` (= 병합, design spec §2) — to
- * the merge/download pipeline supplied by {@link App} via `onExportAll`. The
- * button is enabled only while at least one page is loaded, shows an
- * in-progress label while an export is running, and surfaces an inline Korean
- * error if the merge/download fails (design spec §6, 인라인 오류 메시지). The
- * remaining two actions (선택 페이지 내보내기 / 분할) stay disabled until their
- * own grains land.
+ * grain-2 wired `전체 내보내기` (= 병합, design spec §2); grain-1 (this) wires
+ * `선택 페이지 내보내기` (= 추출, design spec §2) to the extract/download
+ * pipeline supplied by {@link App} via `onExportSelected`. Both share one
+ * pattern: the button is enabled only when its inputs are non-empty and no
+ * export is already running, shows an in-progress label while its export runs,
+ * and surfaces an inline Korean error if the pipeline fails (design spec §6,
+ * 인라인 오류 메시지). A single in-flight guard blocks starting a second export
+ * mid-run. The last action (분할) stays disabled until its own grain lands.
  */
 import { useState } from 'react'
 import type { SourceFile, WorkspacePage } from '../core/types'
@@ -22,9 +23,17 @@ import type { SourceFile, WorkspacePage } from '../core/types'
  */
 const EXPORT_ERROR_MESSAGE = 'PDF를 만들지 못했어요. 잠시 후 다시 시도해 주세요.'
 
+/** Which export is currently running (`null` = idle). Used as the in-flight guard. */
+type ExportKind = 'all' | 'selected'
+
 export interface ToolbarProps {
   /** Ordered SSoT pages to merge on 전체 내보내기 (order/rotation reflected). */
   pages: WorkspacePage[]
+  /**
+   * The checked pages in workspace order — the exact subset 선택 페이지 내보내기
+   * extracts. Empty when nothing is checked, which disables that action.
+   */
+  selectedPages: WorkspacePage[]
   /** Source files the pages reference; their names drive the export filename. */
   sourceFiles: SourceFile[]
   /**
@@ -32,36 +41,63 @@ export interface ToolbarProps {
    * merge or download fails, which the toolbar turns into the inline error.
    */
   onExportAll: (pages: WorkspacePage[], sourceFiles: SourceFile[]) => Promise<void>
+  /**
+   * Runs the actual extract + download of the checked pages (owned by
+   * {@link App}). Rejects on failure, surfaced as the same inline error.
+   */
+  onExportSelected: (
+    pages: WorkspacePage[],
+    sourceFiles: SourceFile[],
+  ) => Promise<void>
   /** Number of pages currently checked in the grid (SSoT selection size). */
   selectedCount?: number
 }
 
 export default function Toolbar({
   pages,
+  selectedPages,
   sourceFiles,
   onExportAll,
+  onExportSelected,
   selectedCount = 0,
 }: ToolbarProps) {
-  const [isExporting, setIsExporting] = useState(false)
+  const [exporting, setExporting] = useState<ExportKind | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const hasPages = pages.length > 0
-  // Disabled with no pages, and re-disabled mid-export so a second click can't
-  // start an overlapping merge.
-  const canExportAll = hasPages && !isExporting
+  const hasSelection = selectedPages.length > 0
+  const isBusy = exporting !== null
+  // Each action needs its own inputs, and both re-disable during any export so
+  // a second click can't start an overlapping run.
+  const canExportAll = hasPages && !isBusy
+  const canExportSelected = hasSelection && !isBusy
 
-  const handleExportAll = async () => {
-    if (!canExportAll) return
+  // Shared run wrapper for both actions (design spec §6 inline-error pattern):
+  // clear the prior error, mark this action busy, run it, and on failure show
+  // the calm inline copy — the detail is not user-actionable.
+  const runExport = async (
+    kind: ExportKind,
+    action: () => Promise<void>,
+  ): Promise<void> => {
     setError(null)
-    setIsExporting(true)
+    setExporting(kind)
     try {
-      await onExportAll(pages, sourceFiles)
+      await action()
     } catch {
-      // The failure detail is not user-actionable; show the calm inline copy.
       setError(EXPORT_ERROR_MESSAGE)
     } finally {
-      setIsExporting(false)
+      setExporting(null)
     }
+  }
+
+  const handleExportAll = () => {
+    if (!canExportAll) return
+    void runExport('all', () => onExportAll(pages, sourceFiles))
+  }
+
+  const handleExportSelected = () => {
+    if (!canExportSelected) return
+    void runExport('selected', () => onExportSelected(selectedPages, sourceFiles))
   }
 
   return (
@@ -71,13 +107,19 @@ export default function Toolbar({
           type="button"
           className={`btn ${canExportAll ? 'btn--primary' : 'btn--disabled'}`}
           disabled={!canExportAll}
-          aria-busy={isExporting}
+          aria-busy={exporting === 'all'}
           onClick={handleExportAll}
         >
-          {isExporting ? '내보내는 중…' : '전체 내보내기'}
+          {exporting === 'all' ? '내보내는 중…' : '전체 내보내기'}
         </button>
-        <button type="button" className="btn btn--disabled" disabled>
-          선택 페이지 내보내기
+        <button
+          type="button"
+          className={`btn ${canExportSelected ? 'btn--primary' : 'btn--disabled'}`}
+          disabled={!canExportSelected}
+          aria-busy={exporting === 'selected'}
+          onClick={handleExportSelected}
+        >
+          {exporting === 'selected' ? '내보내는 중…' : '선택 페이지 내보내기'}
         </button>
         <button type="button" className="btn btn--disabled" disabled>
           분할
