@@ -86,7 +86,7 @@ export default function Dropzone({
     .join(' ')
 
   return (
-    <main className="workspace">
+    <>
       <section
         className={dropClasses}
         aria-label="PDF 불러오기 영역"
@@ -180,6 +180,6 @@ export default function Dropzone({
           </ul>
         </section>
       )}
-    </main>
+    </>
   )
 }

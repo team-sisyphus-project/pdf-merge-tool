@@ -360,6 +360,122 @@
   border-radius: var(--radius-full);
 }
 
+/* ── Page grid ──────────────────────────────────────────────── */
+.page-grid-section {
+  width: 100%;
+  max-width: 1080px;
+}
+
+.page-grid__title {
+  margin: 0 0 var(--space-md);
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* ── Page thumbnail card ────────────────────────────────────── */
+.page-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.page-card__thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.page-card__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Page-number badge, top-right of the thumbnail. */
+.page-card__badge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  min-width: 20px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  color: var(--color-text-inverse);
+  background-color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  opacity: 0.85;
+}
+
+.page-card__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-disabled);
+  font-size: var(--text-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.page-card__status--error {
+  color: var(--color-status-danger);
+}
+
+.page-card__spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-accent-primary);
+  border-radius: var(--radius-full);
+  animation: page-card-spin 0.8s linear infinite;
+}
+
+@keyframes page-card-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* Source colour tag: fill comes from the categorical token (inline var). */
+.page-card__tag {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+}
+
+.page-card__source {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-size-xs);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .app-header {
