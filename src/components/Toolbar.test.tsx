@@ -151,6 +151,52 @@ describe('Toolbar — 범위 지정 분할', () => {
     expect(onSplitByRanges).toHaveBeenCalledTimes(1)
     expect(onSplitByRanges).toHaveBeenCalledWith('1-2', pages, SOURCE_FILES)
   })
+
+  // Each classified parseRange failure must surface *its own* inline message,
+  // disable 범위 분할, and block the export (design spec §6, grain-2 DoneWhen:
+  // "잘못된 범위 각 케이스에서 인라인 메시지가 표시되고 버튼이 비활성화").
+  // pages.length is 2 here, so the fixtures below map to each RangeErrorKind.
+  const INVALID_RANGE_CASES: ReadonlyArray<{
+    kind: string
+    input: string
+    expectedFragment: string
+  }> = [
+    // 'empty' shows no alert (a blank field is not yet a mistake); covered by
+    // the dedicated "disabled while the range field is empty" test above.
+    { kind: 'invalid-token', input: 'abc', expectedFragment: '올바른 범위 형식이 아닙니다' },
+    { kind: 'reversed-range', input: '2-1', expectedFragment: '앞섭니다' },
+    { kind: 'out-of-range', input: '3', expectedFragment: '문서 범위를 벗어났습니다' },
+  ]
+
+  it.each(INVALID_RANGE_CASES)(
+    'shows the $kind inline message, disables the button and blocks export',
+    ({ input, expectedFragment }) => {
+      const { onSplitByRanges } = renderToolbar()
+
+      fireEvent.change(rangeField(), { target: { value: input } })
+
+      const alert = screen.getByRole('alert')
+      expect(alert.textContent).toContain(expectedFragment)
+      expect(splitRangesButton().disabled).toBe(true)
+      expect(rangeField().getAttribute('aria-invalid')).toBe('true')
+
+      fireEvent.click(splitRangesButton())
+      expect(onSplitByRanges).not.toHaveBeenCalled()
+    },
+  )
+
+  it('clears the inline error and re-enables the button once corrected', () => {
+    renderToolbar()
+
+    fireEvent.change(rangeField(), { target: { value: '9' } })
+    expect(screen.queryByRole('alert')).not.toBeNull()
+    expect(splitRangesButton().disabled).toBe(true)
+
+    fireEvent.change(rangeField(), { target: { value: '1-2' } })
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(splitRangesButton().disabled).toBe(false)
+    expect(rangeField().getAttribute('aria-invalid')).toBeNull()
+  })
 })
 
 describe('Toolbar — in-flight guard', () => {
