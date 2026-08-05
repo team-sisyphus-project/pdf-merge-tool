@@ -1,45 +1,216 @@
-.workspace {
+/*
+ * Workspace shell layout + component styles for the empty state.
+ * All design values come from the token surface in global.css.
+ * Non-design implementation values (display, position, overflow) are used
+ * directly per the design-system coding policy.
+ */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ── App header ─────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-surface-default);
+  border-bottom: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.app-header__logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-  padding: var(--space-xl);
-}
-
-.workspace__panel {
-  width: 100%;
-  max-width: 640px;
-  padding: var(--space-xl);
-  background-color: var(--color-surface-default);
-  border: 1px solid var(--color-border-default);
+  width: 40px;
+  height: 40px;
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-soft);
   border-radius: var(--radius-md);
-  text-align: center;
+  flex-shrink: 0;
 }
 
-.workspace__title {
-  margin: 0 0 var(--space-md);
+.app-header__logo svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app-header__title {
+  margin: 0;
+  font-size: var(--text-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.app-header__subtitle {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.app-header__job-badge {
+  flex-shrink: 0;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background-color: var(--color-surface-default);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.toolbar__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.toolbar__hint {
+  margin: 0;
+  font-size: var(--text-size-xs);
+  color: var(--color-text-disabled);
+}
+
+/* ── Button ─────────────────────────────────────────────────── */
+.btn {
+  font-family: inherit;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn--primary {
+  color: var(--color-text-inverse);
+  background-color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--text-size-md);
+}
+
+.btn--disabled,
+.btn:disabled {
+  color: var(--color-text-disabled);
+  background-color: var(--color-surface-muted);
+  border-color: var(--color-border-default);
+  cursor: not-allowed;
+}
+
+/* ── Workspace content (empty state) ────────────────────────── */
+.workspace {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 560px;
+  padding: var(--space-2xl) var(--space-xl);
+  background-color: var(--color-surface-default);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.dropzone__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-lg);
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-full);
+}
+
+.dropzone__icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.dropzone__title {
+  margin: 0 0 var(--space-sm);
   font-size: var(--text-size-xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
 }
 
-.workspace__lead {
-  margin: 0 0 var(--space-sm);
-  font-size: var(--text-size-lg);
-  color: var(--color-text-primary);
-}
-
-.workspace__note {
+.dropzone__desc {
   margin: 0 0 var(--space-lg);
-  font-size: var(--text-size-sm);
+  max-width: 40ch;
+  font-size: var(--text-size-md);
   color: var(--color-text-secondary);
 }
 
-.workspace__placeholder {
-  margin: 0;
-  padding: var(--space-md);
-  font-size: var(--text-size-md);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-accent-primary);
-  border-top: 1px solid var(--color-border-default);
+.dropzone__note {
+  margin: var(--space-lg) 0 0;
+  font-size: var(--text-size-xs);
+  color: var(--color-text-disabled);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar__group {
+    justify-content: center;
+  }
+
+  .toolbar__hint {
+    text-align: center;
+  }
+
+  .workspace {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .dropzone {
+    padding: var(--space-xl) var(--space-lg);
+  }
 }
