@@ -45,6 +45,14 @@ export interface PageGridProps {
    * `pages` array — not local grid state — is the thing that reorders.
    */
   onReorder: (fromId: string, toId: string) => void
+  /** Ids of pages currently checked — drives the per-card selection highlight. */
+  selected: ReadonlySet<string>
+  /** Rotate one page 90° clockwise (SSoT `rotate`). */
+  onRotate: (id: string) => void
+  /** Delete one page (SSoT `delete` for a single id). */
+  onDelete: (id: string) => void
+  /** Toggle one page's membership in the selection (SSoT `toggleSelect`). */
+  onToggleSelect: (id: string) => void
   /** Thumbnail width in device pixels. Defaults to {@link DEFAULT_TARGET_WIDTH}. */
   targetWidth?: number
 }
@@ -65,6 +73,10 @@ export default function PageGrid({
   pages,
   renderer,
   onReorder,
+  selected,
+  onRotate,
+  onDelete,
+  onToggleSelect,
   targetWidth = DEFAULT_TARGET_WIDTH,
 }: PageGridProps) {
   // Pointer for mouse/touch, keyboard for accessibility (Tab to a card, Space to
@@ -132,6 +144,11 @@ export default function PageGrid({
                   color={color}
                   targetWidth={targetWidth}
                   renderer={renderer}
+                  rotation={page.rotation}
+                  selected={selected.has(page.id)}
+                  onRotate={onRotate}
+                  onDelete={onDelete}
+                  onToggleSelect={onToggleSelect}
                 />
               )
             })}

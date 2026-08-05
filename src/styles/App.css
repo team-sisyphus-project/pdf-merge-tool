@@ -97,6 +97,14 @@
   color: var(--color-text-disabled);
 }
 
+/* Live selection count (grain-3): shows `선택 N개` while pages are checked. */
+.toolbar__selection {
+  margin: 0;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent-primary);
+}
+
 /* ── Button ─────────────────────────────────────────────────── */
 .btn {
   font-family: inherit;
@@ -404,6 +412,14 @@
   z-index: 1;
 }
 
+/* Selected state (grain-3): accent border + accent ring so a checked page reads
+ * as chosen at a glance. Ring width (2px) is an implementation setting; its
+ * colour is the accent token. */
+.page-card--selected {
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-primary);
+}
+
 .page-card__thumb {
   position: relative;
   display: flex;
@@ -419,6 +435,10 @@
   max-height: 100%;
   object-fit: contain;
   box-shadow: var(--shadow-sm);
+  /* Rotation preview (grain-3): the inline `rotate(Ndeg)` transform animates so
+   * a 90° step reads as a turn rather than a jump. */
+  transition: transform var(--transition-duration-base)
+    var(--transition-easing-standard);
 }
 
 /* Page-number badge, top-right of the thumbnail. */
@@ -435,6 +455,72 @@
   background-color: var(--color-text-primary);
   border-radius: var(--radius-full);
   opacity: 0.85;
+}
+
+/* Selection checkbox, top-left of the thumbnail. */
+.page-card__select {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  display: flex;
+  cursor: pointer;
+}
+
+.page-card__checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--color-accent-primary);
+}
+
+/* Rotate / delete action row, bottom of the thumbnail. */
+.page-card__actions {
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-sm);
+  display: flex;
+  gap: var(--space-xs);
+}
+
+/* Icon button (grain-3): compact square button holding a single glyph, used for
+ * the per-card rotate/delete controls. */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: var(--space-xs);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: color var(--transition-duration-base)
+      var(--transition-easing-standard),
+    background-color var(--transition-duration-base)
+      var(--transition-easing-standard),
+    border-color var(--transition-duration-base)
+      var(--transition-easing-standard);
+}
+
+.icon-btn:hover {
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  background-color: var(--color-accent-soft);
+}
+
+.icon-btn--danger:hover {
+  color: var(--color-status-danger);
+  border-color: var(--color-status-danger);
+  background-color: var(--color-status-danger-soft);
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .page-card__status {

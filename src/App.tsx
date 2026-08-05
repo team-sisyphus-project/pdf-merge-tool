@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import AppHeader from './components/AppHeader'
 import Toolbar from './components/Toolbar'
 import Dropzone from './components/Dropzone'
@@ -24,15 +24,23 @@ export default function App() {
   // what keeps a many-page file from being re-parsed per thumbnail.
   const renderer = useMemo(() => new ThumbnailRenderer(), [])
 
-  // The SSoT `pages` array (order/rotation/deletion) plus its mutations. Drag
-  // reordering commits through `reorder`; rotate/delete/select land in later
-  // grains but are already wired in the hook.
-  const { pages, reorder } = useWorkspacePages(sourceFiles)
+  // The SSoT `pages` array (order/rotation/deletion) plus its mutations and the
+  // selection set. Drag reordering commits through `reorder`; the per-card
+  // rotate/delete/select controls (grain-3) commit through the rest.
+  const { pages, selected, reorder, rotate, delete: deletePages, toggleSelect } =
+    useWorkspacePages(sourceFiles)
+
+  // A card's delete button removes exactly that one page; the SSoT `delete`
+  // takes an id iterable, so wrap the single id.
+  const deleteOne = useCallback(
+    (id: string) => deletePages([id]),
+    [deletePages],
+  )
 
   return (
     <div className="app-shell">
       <AppHeader />
-      <Toolbar />
+      <Toolbar selectedCount={selected.size} />
       <main className="workspace">
         <Dropzone
           sourceFiles={sourceFiles}
@@ -46,6 +54,10 @@ export default function App() {
           pages={pages}
           renderer={renderer}
           onReorder={reorder}
+          selected={selected}
+          onRotate={rotate}
+          onDelete={deleteOne}
+          onToggleSelect={toggleSelect}
         />
       </main>
     </div>

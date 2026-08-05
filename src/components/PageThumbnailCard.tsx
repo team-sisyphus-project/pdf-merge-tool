@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { SourceColor } from '../core/source-color'
@@ -42,6 +42,20 @@ export interface PageThumbnailCardProps {
   targetWidth: number
   /** Shared pdf.js-backed rasteriser (grain-1). */
   renderer: ThumbnailRenderer
+  /**
+   * Absolute orientation of this page in degrees (multiple of 90). Applied as a
+   * CSS transform to the thumbnail image so the preview matches what export will
+   * produce. The SSoT value lives on {@link WorkspacePage.rotation}.
+   */
+  rotation: number
+  /** Whether this page is currently checked in the grid selection. */
+  selected: boolean
+  /** Rotate this page 90° clockwise (commits to the SSoT `pages` array). */
+  onRotate: (id: string) => void
+  /** Delete this page (commits to the SSoT `pages` array + prunes selection). */
+  onDelete: (id: string) => void
+  /** Toggle this page's membership in the grid selection. */
+  onToggleSelect: (id: string) => void
 }
 
 /** Lazy render lifecycle of a single card. */
@@ -57,6 +71,45 @@ type RenderState =
  */
 const PRELOAD_MARGIN = '300px'
 
+/** Clockwise-rotate icon (rotate the page 90°). */
+function RotateIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M21 12a9 9 0 1 1-3.4-7.05M21 4v4h-4"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Trash icon (delete the page). */
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7m4 4v6m4-6v6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Stops a pointer/keyboard event from bubbling to the card root, which carries
+ * dnd-kit's drag listeners. Without this, pressing a control (rotate / delete /
+ * checkbox) would be captured as the start of a drag gesture instead of a click.
+ */
+function stopDragGesture(event: PointerEvent | KeyboardEvent) {
+  event.stopPropagation()
+}
+
 export default function PageThumbnailCard({
   id,
   sourceId,
@@ -67,6 +120,11 @@ export default function PageThumbnailCard({
   color,
   targetWidth,
   renderer,
+  rotation,
+  selected,
+  onRotate,
+  onDelete,
+  onToggleSelect,
 }: PageThumbnailCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null)
   const [visible, setVisible] = useState(false)
@@ -152,9 +210,14 @@ export default function PageThumbnailCard({
     }
   }, [visible, renderer, sourceId, bytes, pageIndex, targetWidth])
 
+  const className =
+    'page-card' +
+    (isDragging ? ' page-card--dragging' : '') +
+    (selected ? ' page-card--selected' : '')
+
   return (
     <div
-      className={`page-card${isDragging ? ' page-card--dragging' : ''}`}
+      className={className}
       ref={setRefs}
       style={dragStyle}
       {...attributes}
@@ -164,6 +227,7 @@ export default function PageThumbnailCard({
         {state.status === 'ready' ? (
           <img
             className="page-card__image"
+            style={{ transform: `rotate(${rotation}deg)` }}
             src={state.dataUrl}
             alt={`${sourceName} ${pageLabel}페이지 미리보기`}
             loading="lazy"
@@ -184,6 +248,47 @@ export default function PageThumbnailCard({
         <span className="page-card__badge" aria-hidden="true">
           {pageLabel}
         </span>
+
+        {/* Selection checkbox. Pointer/keydown are stopped so ticking the box
+            never starts a drag; onChange commits to the SSoT selection set. */}
+        <label
+          className="page-card__select"
+          onPointerDown={stopDragGesture}
+          onKeyDown={stopDragGesture}
+        >
+          <input
+            type="checkbox"
+            className="page-card__checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(id)}
+            aria-label={`${sourceName} ${pageLabel}페이지 선택`}
+          />
+        </label>
+
+        {/* Rotate / delete controls. Same drag-gesture guard so a click acts on
+            the page instead of picking the card up. */}
+        <div
+          className="page-card__actions"
+          onPointerDown={stopDragGesture}
+          onKeyDown={stopDragGesture}
+        >
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => onRotate(id)}
+            aria-label={`${sourceName} ${pageLabel}페이지 90도 회전`}
+          >
+            <RotateIcon />
+          </button>
+          <button
+            type="button"
+            className="icon-btn icon-btn--danger"
+            onClick={() => onDelete(id)}
+            aria-label={`${sourceName} ${pageLabel}페이지 삭제`}
+          >
+            <TrashIcon />
+          </button>
+        </div>
       </div>
 
       <div className="page-card__meta">

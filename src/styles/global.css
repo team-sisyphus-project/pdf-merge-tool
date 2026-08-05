@@ -67,6 +67,10 @@
 
   /* opacity */
   --opacity-dragging: 0.55;
+
+  /* transition — duration + easing for UI state changes (rotate, hover, press) */
+  --transition-duration-base: 180ms;
+  --transition-easing-standard: ease;
 }
 
 *,
