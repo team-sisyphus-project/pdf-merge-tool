@@ -45,3 +45,28 @@ export interface LoadError {
 export type LoadResult =
   | { ok: true; file: SourceFile }
   | { ok: false; error: LoadError }
+
+/**
+ * One page as it currently sits in the workspace (design spec §5).
+ *
+ * The `pages` array is the single source of truth (SSoT) for order, rotation,
+ * and deletion: reordering the array reorders the export, a page absent from
+ * the array is deleted from the result, and `rotation` is the page's absolute
+ * orientation. A `WorkspacePage` points back to its origin via
+ * `sourceFileId` + `pageIndex` rather than owning bytes, so the original
+ * {@link SourceFile} data is never mutated.
+ */
+export interface WorkspacePage {
+  /** Stable identifier for this page instance (distinct from the source page). */
+  id: string
+  /** {@link SourceFile.id} this page was copied from. */
+  sourceFileId: string
+  /** Zero-based index of the page within its source document. */
+  pageIndex: number
+  /**
+   * Absolute rotation to apply on export, in degrees. Expected to be a
+   * multiple of 90 (0 / 90 / 180 / 270); this is the full orientation state,
+   * not a delta over the source page's own rotation.
+   */
+  rotation: number
+}
