@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildExportFilename } from './download'
+import { buildExportFilename, buildSplitFilenames } from './download'
 
 describe('buildExportFilename — default fallback', () => {
   it('uses the default merged name for an empty list', () => {
@@ -87,6 +87,100 @@ describe('buildExportFilename — determinism', () => {
   it('always ends in .pdf', () => {
     for (const names of [[], ['x'], ['x.pdf', 'y.pdf'], ['.pdf']]) {
       expect(buildExportFilename(names).endsWith('.pdf')).toBe(true)
+    }
+  })
+})
+
+describe('buildSplitFilenames — numbering', () => {
+  it('numbers parts from 1 with a hyphen suffix', () => {
+    expect(buildSplitFilenames('report.pdf', 3)).toEqual([
+      'report-1.pdf',
+      'report-2.pdf',
+      'report-3.pdf',
+    ])
+  })
+
+  it('returns a single name for count 1', () => {
+    expect(buildSplitFilenames('report.pdf', 1)).toEqual(['report-1.pdf'])
+  })
+
+  it('returns an empty array for count 0', () => {
+    expect(buildSplitFilenames('report.pdf', 0)).toEqual([])
+  })
+
+  it('zero-pads the suffix to the width of count', () => {
+    const names = buildSplitFilenames('report.pdf', 12)
+    expect(names[0]).toBe('report-01.pdf')
+    expect(names[8]).toBe('report-09.pdf')
+    expect(names[9]).toBe('report-10.pdf')
+    expect(names[11]).toBe('report-12.pdf')
+  })
+
+  it('sorts lexically in numeric order thanks to padding', () => {
+    const names = buildSplitFilenames('doc.pdf', 10)
+    expect([...names].sort()).toEqual(names)
+  })
+})
+
+describe('buildSplitFilenames — base sanitization', () => {
+  it('strips the trailing .pdf before numbering', () => {
+    expect(buildSplitFilenames('report.PDF', 2)).toEqual([
+      'report-1.pdf',
+      'report-2.pdf',
+    ])
+  })
+
+  it('appends numbering when the base has no extension', () => {
+    expect(buildSplitFilenames('report', 2)).toEqual([
+      'report-1.pdf',
+      'report-2.pdf',
+    ])
+  })
+
+  it('drops a directory prefix', () => {
+    expect(buildSplitFilenames('docs/sub/report.pdf', 1)).toEqual([
+      'report-1.pdf',
+    ])
+  })
+
+  it('replaces reserved characters in the base', () => {
+    expect(buildSplitFilenames('a<b>c.pdf', 1)).toEqual(['a_b_c-1.pdf'])
+  })
+
+  it('falls back to the default split base when unusable', () => {
+    expect(buildSplitFilenames('   ', 2)).toEqual(['split-1.pdf', 'split-2.pdf'])
+  })
+
+  it('honors a custom fallback base', () => {
+    expect(buildSplitFilenames('.pdf', 2, { fallback: 'part' })).toEqual([
+      'part-1.pdf',
+      'part-2.pdf',
+    ])
+  })
+
+  it('reverts to the default when the custom fallback sanitizes to empty', () => {
+    expect(buildSplitFilenames('', 1, { fallback: '   ' })).toEqual([
+      'split-1.pdf',
+    ])
+  })
+})
+
+describe('buildSplitFilenames — guards', () => {
+  it('rejects a negative count', () => {
+    expect(() => buildSplitFilenames('report.pdf', -1)).toThrow(
+      /non-negative integer/,
+    )
+  })
+
+  it('rejects a non-integer count', () => {
+    expect(() => buildSplitFilenames('report.pdf', 2.5)).toThrow(
+      /non-negative integer/,
+    )
+  })
+
+  it('always ends every name in .pdf', () => {
+    for (const name of buildSplitFilenames('report.pdf', 5)) {
+      expect(name.endsWith('.pdf')).toBe(true)
     }
   })
 })

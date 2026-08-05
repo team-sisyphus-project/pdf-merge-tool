@@ -15,8 +15,11 @@
  * `merge.ts`'s job (out of scope here).
  */
 
-/** Default base name used when no usable source name is available. */
+/** Default base name used when no usable source name is available (merge export). */
 const DEFAULT_BASE = 'merged'
+
+/** Default base name for split parts when no usable source name is available. */
+const DEFAULT_SPLIT_BASE = 'split'
 
 /**
  * File-name characters reserved on common platforms — `< > : " | ? *`. Path
@@ -86,21 +89,67 @@ export function buildExportFilename(
 }
 
 /**
- * Wraps PDF bytes in a Blob and triggers a browser download (design spec §5,
- * "→ Blob 다운로드").
+ * Builds deterministic, ordered file names for a multi-part split result
+ * (design spec §2, "N페이지 단위 분할 / 범위 지정 분할 → 다중 파일이면 zip").
+ *
+ * Each part is named `"<base>-<n>.pdf"` where `n` is its 1-based position. The
+ * numeric suffix is zero-padded to the width of `count`, so parts sort
+ * naturally both inside a zip and in a file manager:
+ *
+ * - `count` 3 → `["report-1.pdf", "report-2.pdf", "report-3.pdf"]`
+ * - `count` 12 → `["report-01.pdf", …, "report-12.pdf"]`
+ *
+ * The base is sanitized like {@link buildExportFilename} (directory prefix
+ * dropped, trailing `.pdf` removed, reserved characters replaced). When it
+ * sanitizes to empty, `options.fallback` (default `"split"`) is used.
+ *
+ * @param baseName Raw base name to derive part names from (typically a source
+ *   file name).
+ * @param count Number of parts; must be a non-negative integer. `0` yields `[]`.
+ * @param options.fallback Base name used when `baseName` is unusable. Defaults
+ *   to `"split"`.
+ * @returns One safe `.pdf` file name per part, in order.
+ * @throws If `count` is not a non-negative integer.
+ */
+export function buildSplitFilenames(
+  baseName: string,
+  count: number,
+  options: { fallback?: string } = {},
+): string[] {
+  if (!Number.isInteger(count) || count < 0) {
+    throw new Error(
+      `buildSplitFilenames: count must be a non-negative integer (got ${count})`,
+    )
+  }
+  if (count === 0) return []
+
+  const fallbackBase =
+    toSafeBase(options.fallback ?? DEFAULT_SPLIT_BASE) || DEFAULT_SPLIT_BASE
+  const base = toSafeBase(baseName) || fallbackBase
+
+  // Pad so lexical order matches numeric order (e.g. "09" before "10").
+  const width = String(count).length
+  return Array.from({ length: count }, (_unused, index) => {
+    const suffix = String(index + 1).padStart(width, '0')
+    return `${base}-${suffix}.pdf`
+  })
+}
+
+/**
+ * Wraps any {@link Blob} in a browser download (design spec §5, "→ Blob 다운로드").
  *
  * A temporary object URL backs an off-DOM anchor whose `download` attribute
  * carries `filename`; the anchor is clicked to start the download and the
  * object URL is revoked afterwards so the Blob can be garbage-collected. All
  * processing stays client-side — no bytes leave the browser (design spec §1).
  *
- * @param bytes The serialized PDF payload (e.g. `mergePages`' output).
- * @param filename The download file name; use {@link buildExportFilename}.
+ * This is the generic primitive behind {@link downloadPdf}; use it directly for
+ * non-PDF payloads such as the zip `Blob` from `zipFiles`.
+ *
+ * @param blob The payload to download (PDF, zip, …). Its own `type` is used.
+ * @param filename The download file name.
  */
-export function downloadPdf(bytes: Uint8Array, filename: string): void {
-  // Cast around TS's ArrayBufferLike/ArrayBuffer generic mismatch: pdf-lib
-  // returns `Uint8Array<ArrayBufferLike>`, which is a valid BlobPart at runtime.
-  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
+export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   try {
     const anchor = document.createElement('a')
@@ -115,4 +164,21 @@ export function downloadPdf(bytes: Uint8Array, filename: string): void {
     // The click has already captured the Blob, so it is safe to release the URL.
     URL.revokeObjectURL(url)
   }
+}
+
+/**
+ * Wraps PDF bytes in a Blob and triggers a browser download (design spec §5,
+ * "→ Blob 다운로드").
+ *
+ * Thin `application/pdf` wrapper over {@link downloadBlob}; all processing stays
+ * client-side (design spec §1).
+ *
+ * @param bytes The serialized PDF payload (e.g. `mergePages`' output).
+ * @param filename The download file name; use {@link buildExportFilename}.
+ */
+export function downloadPdf(bytes: Uint8Array, filename: string): void {
+  // Cast around TS's ArrayBufferLike/ArrayBuffer generic mismatch: pdf-lib
+  // returns `Uint8Array<ArrayBufferLike>`, which is a valid BlobPart at runtime.
+  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
+  downloadBlob(blob, filename)
 }
