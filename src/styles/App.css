@@ -105,6 +105,14 @@
   color: var(--color-accent-primary);
 }
 
+/* Inline export failure (grain-2): breaks to its own row in the flex toolbar. */
+.toolbar__error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--text-size-xs);
+  color: var(--color-status-danger);
+}
+
 /* ── Button ─────────────────────────────────────────────────── */
 .btn {
   font-family: inherit;
