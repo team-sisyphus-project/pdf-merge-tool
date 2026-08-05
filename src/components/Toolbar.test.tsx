@@ -34,6 +34,8 @@ function renderToolbar(overrides: Partial<React.ComponentProps<typeof Toolbar>> 
     sourceFiles: SOURCE_FILES,
     onExportAll: vi.fn().mockResolvedValue(undefined),
     onExportSelected: vi.fn().mockResolvedValue(undefined),
+    onSplitByCount: vi.fn().mockResolvedValue(undefined),
+    onSplitByRanges: vi.fn().mockResolvedValue(undefined),
     selectedCount: 0,
     ...overrides,
   }
@@ -43,6 +45,14 @@ function renderToolbar(overrides: Partial<React.ComponentProps<typeof Toolbar>> 
 
 const selectedExportButton = () =>
   screen.getByRole('button', { name: '선택 페이지 내보내기' }) as HTMLButtonElement
+
+// Split controls use a stable aria-label so accessors survive the busy label swap.
+const countField = () => screen.getByLabelText('분할할 페이지 수') as HTMLInputElement
+const rangeField = () => screen.getByLabelText('분할 범위') as HTMLInputElement
+const splitCountButton = () =>
+  screen.getByRole('button', { name: 'N페이지 단위 분할' }) as HTMLButtonElement
+const splitRangesButton = () =>
+  screen.getByRole('button', { name: '범위 지정 분할' }) as HTMLButtonElement
 
 describe('Toolbar — 선택 페이지 내보내기', () => {
   it('is disabled when no pages are selected', () => {
@@ -71,5 +81,96 @@ describe('Toolbar — 선택 페이지 내보내기', () => {
     fireEvent.click(selectedExportButton())
 
     expect(onExportSelected).not.toHaveBeenCalled()
+  })
+})
+
+describe('Toolbar — N페이지 단위 분할', () => {
+  it('is disabled until a positive page count is entered', () => {
+    renderToolbar()
+    expect(splitCountButton().disabled).toBe(true)
+
+    fireEvent.change(countField(), { target: { value: '2' } })
+    expect(splitCountButton().disabled).toBe(false)
+  })
+
+  it('rejects non-positive or non-integer counts', () => {
+    renderToolbar()
+    for (const bad of ['0', '-1', '1.5', 'abc', '']) {
+      fireEvent.change(countField(), { target: { value: bad } })
+      expect(splitCountButton().disabled).toBe(true)
+    }
+  })
+
+  it('hands the numeric count, pages and source files to onSplitByCount', () => {
+    const pages = [page('p-1'), page('p-2')]
+    const { onSplitByCount } = renderToolbar({ pages })
+
+    fireEvent.change(countField(), { target: { value: '2' } })
+    fireEvent.click(splitCountButton())
+
+    expect(onSplitByCount).toHaveBeenCalledTimes(1)
+    expect(onSplitByCount).toHaveBeenCalledWith(2, pages, SOURCE_FILES)
+  })
+
+  it('stays disabled with no handler wired', () => {
+    renderToolbar({ onSplitByCount: undefined })
+    fireEvent.change(countField(), { target: { value: '2' } })
+    expect(splitCountButton().disabled).toBe(true)
+  })
+})
+
+describe('Toolbar — 범위 지정 분할', () => {
+  it('is disabled while the range field is empty', () => {
+    renderToolbar()
+    expect(splitRangesButton().disabled).toBe(true)
+  })
+
+  it('shows an inline error and blocks the run for an invalid range', () => {
+    // Only 2 pages exist, so "3" is out of range → parseRange fails inline.
+    const { onSplitByRanges } = renderToolbar()
+
+    fireEvent.change(rangeField(), { target: { value: '3' } })
+
+    expect(screen.getByRole('alert')).toBeTruthy()
+    expect(splitRangesButton().disabled).toBe(true)
+
+    fireEvent.click(splitRangesButton())
+    expect(onSplitByRanges).not.toHaveBeenCalled()
+    expect(rangeField().getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('enables and passes the raw range string to onSplitByRanges when valid', () => {
+    const pages = [page('p-1'), page('p-2')]
+    const { onSplitByRanges } = renderToolbar({ pages })
+
+    fireEvent.change(rangeField(), { target: { value: '1-2' } })
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(splitRangesButton().disabled).toBe(false)
+
+    fireEvent.click(splitRangesButton())
+    expect(onSplitByRanges).toHaveBeenCalledTimes(1)
+    expect(onSplitByRanges).toHaveBeenCalledWith('1-2', pages, SOURCE_FILES)
+  })
+})
+
+describe('Toolbar — in-flight guard', () => {
+  it('disables the other actions while a split is running', () => {
+    // A never-resolving handler keeps the toolbar in its busy state.
+    const onSplitByCount = vi.fn(() => new Promise<void>(() => {}))
+    renderToolbar({ onSplitByCount, selectedPages: [page('p-1')], selectedCount: 1 })
+
+    fireEvent.change(countField(), { target: { value: '2' } })
+    fireEvent.click(splitCountButton())
+
+    expect(splitCountButton().getAttribute('aria-busy')).toBe('true')
+    expect(splitRangesButton().disabled).toBe(true)
+    expect(selectedExportButton().disabled).toBe(true)
+    expect(
+      (screen.getByRole('button', { name: '전체 내보내기' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true)
+    // Inputs lock too, so the running split can't be re-parameterised mid-run.
+    expect(countField().disabled).toBe(true)
+    expect(rangeField().disabled).toBe(true)
   })
 })

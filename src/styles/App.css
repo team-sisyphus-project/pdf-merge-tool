@@ -91,6 +91,60 @@
   gap: var(--space-sm);
 }
 
+/* Split controls (grain-2): the N-page / range inputs sit inline with their run
+ * buttons; align-items keeps the button centred on the input row. */
+.toolbar__group--split {
+  align-items: center;
+}
+
+.split-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* ── Text/number field ──────────────────────────────────────── */
+/* Shared input surface (grain-2). Design values come from tokens; element width
+ * is a direct dimension like other sized elements (logo, dropzone, grid). */
+.field-input {
+  font-family: inherit;
+  font-size: var(--text-size-sm);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.field-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.field-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.field-input:disabled {
+  color: var(--color-text-disabled);
+  background-color: var(--color-surface-muted);
+  cursor: not-allowed;
+}
+
+/* Invalid range string: danger border echoing the inline error message. */
+.field-input--invalid {
+  border-color: var(--color-status-danger);
+}
+
+.field-input--count {
+  width: 6rem;
+}
+
+.field-input--range {
+  width: 13rem;
+}
+
 .toolbar__hint {
   margin: 0;
   font-size: var(--text-size-xs);
