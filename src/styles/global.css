@@ -17,6 +17,9 @@
   --color-border-default: #e5e7eb;
   --color-border-strong: #cbd5e1;
   --color-accent-primary: #2563eb;
+  --color-status-danger: #dc2626;
+  --color-status-danger-soft: #fef2f2;
+  --color-status-danger-border: #fecaca;
 
   /* typography */
   --font-family-base: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic',
