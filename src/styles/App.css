@@ -388,6 +388,20 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  /* Drag affordances (grain-2). `cursor`/`touch-action`/`z-index` are
+   * implementation settings; the perceivable design values (shadow, opacity)
+   * come from tokens below. */
+  cursor: grab;
+  touch-action: none;
+}
+
+/* Lifted state while this card is the one being dragged: raised elevation +
+ * dimmed so the shifting neighbours (the drop-position preview) read clearly. */
+.page-card--dragging {
+  box-shadow: var(--shadow-md);
+  opacity: var(--opacity-dragging);
+  cursor: grabbing;
+  z-index: 1;
 }
 
 .page-card__thumb {

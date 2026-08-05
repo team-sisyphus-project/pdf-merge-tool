@@ -3,9 +3,9 @@ import AppHeader from './components/AppHeader'
 import Toolbar from './components/Toolbar'
 import Dropzone from './components/Dropzone'
 import PageGrid from './components/PageGrid'
-import { deriveWorkspacePages } from './core/pages'
 import { ThumbnailRenderer } from './core/thumbnail'
 import { useSourceFiles } from './state/useSourceFiles'
+import { useWorkspacePages } from './state/useWorkspacePages'
 import './styles/App.css'
 
 /**
@@ -23,7 +23,11 @@ export default function App() {
   // One rasteriser for the whole workspace — its per-source document cache is
   // what keeps a many-page file from being re-parsed per thumbnail.
   const renderer = useMemo(() => new ThumbnailRenderer(), [])
-  const pages = useMemo(() => deriveWorkspacePages(sourceFiles), [sourceFiles])
+
+  // The SSoT `pages` array (order/rotation/deletion) plus its mutations. Drag
+  // reordering commits through `reorder`; rotate/delete/select land in later
+  // grains but are already wired in the hook.
+  const { pages, reorder } = useWorkspacePages(sourceFiles)
 
   return (
     <div className="app-shell">
@@ -37,7 +41,12 @@ export default function App() {
           onAddFiles={addFiles}
           onDismissRejected={dismissRejected}
         />
-        <PageGrid sourceFiles={sourceFiles} pages={pages} renderer={renderer} />
+        <PageGrid
+          sourceFiles={sourceFiles}
+          pages={pages}
+          renderer={renderer}
+          onReorder={reorder}
+        />
       </main>
     </div>
   )

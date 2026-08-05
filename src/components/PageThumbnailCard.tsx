@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { SourceColor } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
 
@@ -21,6 +24,8 @@ import type { ThumbnailRenderer } from '../core/thumbnail'
  * document cache across every card.
  */
 export interface PageThumbnailCardProps {
+  /** SSoT page id — the sortable item id dnd-kit reorders on ({@link WorkspacePage.id}). */
+  id: string
   /** Origin file id — the renderer's document-cache key. */
   sourceId: string
   /** Original PDF bytes of the origin file (handed to the renderer). */
@@ -53,6 +58,7 @@ type RenderState =
 const PRELOAD_MARGIN = '300px'
 
 export default function PageThumbnailCard({
+  id,
   sourceId,
   bytes,
   pageIndex,
@@ -62,9 +68,39 @@ export default function PageThumbnailCard({
   targetWidth,
   renderer,
 }: PageThumbnailCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement | null>(null)
   const [visible, setVisible] = useState(false)
   const [state, setState] = useState<RenderState>({ status: 'idle' })
+
+  // Sortable wiring (grain-2). `useSortable` supplies the drag handle listeners,
+  // the live transform that slides this card as siblings are reordered, and the
+  // `isDragging` flag that drives the lifted drag-state styling. The reorder
+  // itself is committed by the grid's `onDragEnd` against the SSoT `pages`
+  // array — this component only renders the interaction.
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  // One DOM node feeds two consumers: dnd-kit's sortable ref and the local
+  // IntersectionObserver ref. A callback ref sets both so neither feature has
+  // to give up its handle on the card element.
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      cardRef.current = node
+      setNodeRef(node)
+    },
+    [setNodeRef],
+  )
+
+  const dragStyle: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   // Observe viewport entry; flip `visible` once (then stop observing) so the
   // render fires a single time. Where IntersectionObserver is unavailable
@@ -117,7 +153,13 @@ export default function PageThumbnailCard({
   }, [visible, renderer, sourceId, bytes, pageIndex, targetWidth])
 
   return (
-    <div className="page-card" ref={cardRef}>
+    <div
+      className={`page-card${isDragging ? ' page-card--dragging' : ''}`}
+      ref={setRefs}
+      style={dragStyle}
+      {...attributes}
+      {...listeners}
+    >
       <div className="page-card__thumb">
         {state.status === 'ready' ? (
           <img

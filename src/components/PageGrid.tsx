@@ -1,4 +1,18 @@
 import { useMemo } from 'react'
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import {
+  SortableContext,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
 import { assignSourceColors } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
 import type { SourceFile, WorkspacePage } from '../core/types'
@@ -25,6 +39,12 @@ export interface PageGridProps {
   pages: WorkspacePage[]
   /** Shared rasteriser so all cards reuse one parsed-document cache. */
   renderer: ThumbnailRenderer
+  /**
+   * Commits a drag: move the page dragged (`fromId`) onto the slot of the page
+   * it was dropped over (`toId`). Wired to the SSoT `reorder` mutation so the
+   * `pages` array — not local grid state — is the thing that reorders.
+   */
+  onReorder: (fromId: string, toId: string) => void
   /** Thumbnail width in device pixels. Defaults to {@link DEFAULT_TARGET_WIDTH}. */
   targetWidth?: number
 }
@@ -32,12 +52,32 @@ export interface PageGridProps {
 /** Device-pixel width each thumbnail is rasterised at. Implementation setting. */
 const DEFAULT_TARGET_WIDTH = 240
 
+/**
+ * How far the pointer must travel before a drag starts (px). Keeps a plain
+ * click/tap on the card from being swallowed as a drag — leaving room for the
+ * per-card controls (rotate/delete/select) later grains add. Implementation
+ * setting, not a design token.
+ */
+const DRAG_ACTIVATION_DISTANCE = 5
+
 export default function PageGrid({
   sourceFiles,
   pages,
   renderer,
+  onReorder,
   targetWidth = DEFAULT_TARGET_WIDTH,
 }: PageGridProps) {
+  // Pointer for mouse/touch, keyboard for accessibility (Tab to a card, Space to
+  // pick up, arrows to move, Space to drop). The keyboard sensor uses the
+  // sortable coordinate getter so arrow keys map to grid neighbours.
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
   // Colour per source id, assigned in load order (stable across re-renders).
   const colors = useMemo(
     () => assignSourceColors(sourceFiles.map((file) => file.id)),
@@ -50,34 +90,54 @@ export default function PageGrid({
     return map
   }, [sourceFiles])
 
+  // Sortable item ids, in current grid order — dnd-kit diffs order against this.
+  const itemIds = useMemo(() => pages.map((page) => page.id), [pages])
+
+  // Translate a finished drag into an SSoT reorder. `over` is null when dropped
+  // outside any card; an unchanged target is a no-op we skip.
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    onReorder(String(active.id), String(over.id))
+  }
+
   if (pages.length === 0) return null
 
   return (
     <section className="page-grid-section" aria-label="페이지 미리보기">
       <h3 className="page-grid__title">페이지 {pages.length}개</h3>
-      <div className="page-grid">
-        {pages.map((page) => {
-          const source = byId.get(page.sourceFileId)
-          const color = colors.get(page.sourceFileId)
-          // A page whose source vanished is a corrupt derivation, not a render
-          // error — skip it rather than crash the whole grid.
-          if (!source || !color) return null
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={itemIds} strategy={rectSortingStrategy}>
+          <div className="page-grid">
+            {pages.map((page) => {
+              const source = byId.get(page.sourceFileId)
+              const color = colors.get(page.sourceFileId)
+              // A page whose source vanished is a corrupt derivation, not a
+              // render error — skip it rather than crash the whole grid.
+              if (!source || !color) return null
 
-          return (
-            <PageThumbnailCard
-              key={page.id}
-              sourceId={source.id}
-              bytes={source.bytes}
-              pageIndex={page.pageIndex}
-              sourceName={source.name}
-              pageLabel={page.pageIndex + 1}
-              color={color}
-              targetWidth={targetWidth}
-              renderer={renderer}
-            />
-          )
-        })}
-      </div>
+              return (
+                <PageThumbnailCard
+                  key={page.id}
+                  id={page.id}
+                  sourceId={source.id}
+                  bytes={source.bytes}
+                  pageIndex={page.pageIndex}
+                  sourceName={source.name}
+                  pageLabel={page.pageIndex + 1}
+                  color={color}
+                  targetWidth={targetWidth}
+                  renderer={renderer}
+                />
+              )
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
     </section>
   )
 }
