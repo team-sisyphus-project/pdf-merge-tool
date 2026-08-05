@@ -5,8 +5,10 @@ import Dropzone from './components/Dropzone'
 import PageGrid from './components/PageGrid'
 import { ThumbnailRenderer } from './core/thumbnail'
 import { mergePages } from './core/merge'
-import { extractPages } from './core/split'
-import { buildExportFilename, downloadPdf } from './core/download'
+import { extractPages, splitByRanges, splitEveryNPages } from './core/split'
+import { buildExportFilename, downloadBlob, downloadPdf } from './core/download'
+import { zipFiles } from './core/zip'
+import { parseRangeGroups, planSplitDownload } from './core/split-plan'
 import type { SourceFile, WorkspacePage } from './core/types'
 import { useSourceFiles } from './state/useSourceFiles'
 import { useWorkspacePages } from './state/useWorkspacePages'
@@ -89,6 +91,52 @@ export default function App() {
     [],
   )
 
+  // Executes a split result (design spec §2): one part downloads as a plain PDF,
+  // several bundle into one zip. The single-vs-zip decision and all naming is the
+  // pure `planSplitDownload`; this wiring only performs the plan's I/O — zip the
+  // entries when needed and hand the Blob/bytes to the client-side download. All
+  // bytes stay in the browser (design spec §1). Shared by both split flows.
+  const deliverSplit = useCallback(
+    async (parts: Uint8Array[], files: SourceFile[]) => {
+      const plan = planSplitDownload(parts, files)
+      if (plan.kind === 'single') {
+        downloadPdf(plan.bytes, plan.filename)
+        return
+      }
+      const blob = await zipFiles(plan.entries)
+      downloadBlob(blob, plan.filename)
+    },
+    [],
+  )
+
+  // N페이지 단위 분할 (design spec §2): chunk the workspace into fixed-size PDFs
+  // via the pure `splitEveryNPages`, then deliver (single PDF or zip). Rejects
+  // propagate so the toolbar surfaces the inline error.
+  const exportSplitByCount = useCallback(
+    async (count: number, pagesToSplit: WorkspacePage[], files: SourceFile[]) => {
+      const parts = await splitEveryNPages(pagesToSplit, files, count)
+      await deliverSplit(parts, files)
+    },
+    [deliverSplit],
+  )
+
+  // 범위 지정 분할 (design spec §2): the toolbar hands us the validated raw range
+  // string; reconstruct one index group per comma segment (`parseRangeGroups`),
+  // split into one PDF per group, then deliver (single PDF or zip). Rejects
+  // propagate so the toolbar surfaces the inline error.
+  const exportSplitByRanges = useCallback(
+    async (
+      rangeInput: string,
+      pagesToSplit: WorkspacePage[],
+      files: SourceFile[],
+    ) => {
+      const groups = parseRangeGroups(rangeInput, pagesToSplit.length)
+      const parts = await splitByRanges(pagesToSplit, files, groups)
+      await deliverSplit(parts, files)
+    },
+    [deliverSplit],
+  )
+
   return (
     <div className="app-shell">
       <AppHeader />
@@ -98,6 +146,8 @@ export default function App() {
         sourceFiles={sourceFiles}
         onExportAll={exportAll}
         onExportSelected={exportSelected}
+        onSplitByCount={exportSplitByCount}
+        onSplitByRanges={exportSplitByRanges}
         selectedCount={selected.size}
       />
       <main className="workspace">
