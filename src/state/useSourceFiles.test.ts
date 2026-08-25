@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createSourceId, loadFiles } from './useSourceFiles'
 import type { LoadResult, SourceFile } from '../core/types'
+import { strings } from '../strings'
 
 /**
  * `loadFiles` is the pure, React-free heart of the state layer. These tests
@@ -44,11 +45,17 @@ function ok(name: string, pageCount: number): LoadResult {
 }
 
 function corrupt(): LoadResult {
-  return { ok: false, error: { kind: 'corrupt', message: '손상' } }
+  return {
+    ok: false,
+    error: { kind: 'corrupt', message: strings.errors.pdfSource.corrupt },
+  }
 }
 
 function encrypted(): LoadResult {
-  return { ok: false, error: { kind: 'encrypted', message: '암호' } }
+  return {
+    ok: false,
+    error: { kind: 'encrypted', message: strings.errors.pdfSource.encrypted },
+  }
 }
 
 describe('loadFiles', () => {
@@ -100,8 +107,16 @@ describe('loadFiles', () => {
 
     expect(added.map((f) => f.name)).toEqual(['good.pdf'])
     expect(rejected).toEqual([
-      { name: 'locked.pdf', kind: 'encrypted', message: '암호' },
-      { name: 'broken.pdf', kind: 'corrupt', message: '손상' },
+      {
+        name: 'locked.pdf',
+        kind: 'encrypted',
+        message: strings.errors.pdfSource.encrypted,
+      },
+      {
+        name: 'broken.pdf',
+        kind: 'corrupt',
+        message: strings.errors.pdfSource.corrupt,
+      },
     ])
   })
 

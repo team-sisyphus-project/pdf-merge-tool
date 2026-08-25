@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { useSourceFiles } from './useSourceFiles'
 import type { LoadResult, SourceFile } from '../core/types'
+import { strings } from '../strings'
 
 afterEach(cleanup)
 
@@ -47,11 +48,11 @@ function ok(name: string, pageCount: number): LoadResult {
 
 const encrypted: LoadResult = {
   ok: false,
-  error: { kind: 'encrypted', message: '암호 해제 후 다시 시도해 주세요.' },
+  error: { kind: 'encrypted', message: strings.errors.pdfSource.encrypted },
 }
 const corrupt: LoadResult = {
   ok: false,
-  error: { kind: 'corrupt', message: '파일이 손상되었습니다.' },
+  error: { kind: 'corrupt', message: strings.errors.pdfSource.corrupt },
 }
 
 function idSeq(): () => string {
