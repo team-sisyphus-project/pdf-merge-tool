@@ -6,7 +6,7 @@ import type { SourceFile, WorkspacePage } from './types'
  *
  * Given the workspace `pages` array (the SSoT for order/rotation/deletion) and
  * the `sourceFiles` those pages reference, this module produces PDF bytes for
- * the three MVP split flows:
+ * the three split/extract flows:
  *
  * 1. {@link extractPages} — the given selection as a *single* PDF.
  * 2. {@link splitEveryNPages} — fixed-size chunks, one PDF per chunk.

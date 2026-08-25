@@ -15,7 +15,7 @@ import type { SourceFile, WorkspacePage } from './types'
 
 /**
  * Rotation a freshly-derived page starts at. Absolute orientation in degrees;
- * later grains (rotate) mutate the SSoT `pages` array, never the source bytes.
+ * the rotate operation mutates the SSoT `pages` array, never the source bytes.
  */
 export const DEFAULT_PAGE_ROTATION = 0
 
