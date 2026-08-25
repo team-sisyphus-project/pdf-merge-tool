@@ -34,6 +34,22 @@ describe('InfoTooltip', () => {
     expect(screen.queryByText(body)).toBeNull()
   })
 
+  it('exposes a Tab-focusable trigger (a native, non-disabled button that takes focus)', () => {
+    const trigger = renderTooltip()
+
+    // A real <button> is in the tab order (Tab reaches it and Enter/Space
+    // activate it natively). jsdom can't drive an actual Tab traversal without
+    // user-event, so we assert the properties that put it in that order: it is a
+    // genuine <button>, not disabled, and its tabIndex was not removed (-1).
+    expect(trigger.tagName).toBe('BUTTON')
+    expect((trigger as HTMLButtonElement).disabled).toBe(false)
+    expect(trigger.tabIndex).not.toBe(-1)
+
+    // And it actually accepts programmatic focus (the end state a Tab produces).
+    trigger.focus()
+    expect(document.activeElement).toBe(trigger)
+  })
+
   it('opens and closes the popover on click, showing the help copy', () => {
     const trigger = renderTooltip()
 
