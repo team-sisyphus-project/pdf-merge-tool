@@ -24,12 +24,12 @@ const REJECTED: RejectedFile[] = [
   {
     name: 'locked.pdf',
     kind: 'encrypted',
-    message: '암호로 보호된 PDF입니다. 암호 해제 후 다시 시도해 주세요.',
+    message: 'This PDF is password-protected. Remove the password and try again.',
   },
   {
     name: 'broken.pdf',
     kind: 'corrupt',
-    message: '파일이 손상되었거나 올바른 PDF 형식이 아닙니다.',
+    message: 'This file is damaged or is not a valid PDF.',
   },
 ]
 
@@ -52,11 +52,11 @@ describe('Dropzone load errors', () => {
 
     expect(screen.getByText('locked.pdf')).toBeDefined()
     expect(
-      screen.getByText((t) => t.includes('암호 해제 후 다시 시도해 주세요')),
+      screen.getByText((t) => t.includes('password-protected')),
     ).toBeDefined()
     expect(screen.getByText('broken.pdf')).toBeDefined()
     expect(
-      screen.getByText((t) => t.includes('손상되었거나')),
+      screen.getByText((t) => t.includes('damaged')),
     ).toBeDefined()
   })
 
@@ -77,7 +77,7 @@ describe('Dropzone load errors', () => {
   it('calls onDismissRejected when the dismiss control is clicked', () => {
     const { onDismissRejected } = renderDropzone({ rejected: REJECTED })
 
-    fireEvent.click(screen.getByText('닫기'))
+    fireEvent.click(screen.getByText('Dismiss'))
 
     expect(onDismissRejected).toHaveBeenCalledTimes(1)
   })

@@ -47,11 +47,14 @@ function ok(name: string, pageCount: number): LoadResult {
 
 const encrypted: LoadResult = {
   ok: false,
-  error: { kind: 'encrypted', message: '암호 해제 후 다시 시도해 주세요.' },
+  error: {
+    kind: 'encrypted',
+    message: 'This PDF is password-protected. Remove the password and try again.',
+  },
 }
 const corrupt: LoadResult = {
   ok: false,
-  error: { kind: 'corrupt', message: '파일이 손상되었습니다.' },
+  error: { kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
 }
 
 function idSeq(): () => string {

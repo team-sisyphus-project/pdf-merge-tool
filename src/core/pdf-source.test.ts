@@ -61,7 +61,7 @@ describe('loadSourceFile', () => {
       expect(result.ok).toBe(false)
       if (result.ok) return
       expect(result.error.kind).toBe('encrypted')
-      expect(result.error.message).toContain('암호')
+      expect(result.error.message).toContain('password')
     })
 
     it('rejects a corrupt/non-PDF file with a distinct "corrupt" error', async () => {

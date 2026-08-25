@@ -12,6 +12,7 @@ import { parseRangeGroups, planSplitDownload } from './core/split-plan'
 import type { SourceFile, WorkspacePage } from './core/types'
 import { useSourceFiles } from './state/useSourceFiles'
 import { useWorkspacePages } from './state/useWorkspacePages'
+import { strings } from './strings'
 import './styles/App.css'
 
 /**
@@ -76,7 +77,7 @@ export default function App() {
       const bytes = await extractPages(pagesToExport, files)
       const nameById = new Map(files.map((file) => [file.id, file.name]))
       // Distinct origin file names in first-seen order; blanks are skipped so
-      // buildExportFilename applies the 선택페이지 fallback when none remain.
+      // buildExportFilename applies the selected-pages fallback when none remain.
       const sourceNames: string[] = []
       const seen = new Set<string>()
       for (const page of pagesToExport) {
@@ -85,7 +86,9 @@ export default function App() {
         const name = nameById.get(page.sourceFileId)
         if (name) sourceNames.push(name)
       }
-      const filename = buildExportFilename(sourceNames, { fallback: '선택페이지' })
+      const filename = buildExportFilename(sourceNames, {
+        fallback: strings.filename.selectedFallback,
+      })
       downloadPdf(bytes, filename)
     },
     [],

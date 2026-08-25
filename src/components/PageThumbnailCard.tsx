@@ -4,24 +4,25 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { SourceColor } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
+import { strings } from '../strings'
 
 /**
- * One page rendered as a thumbnail card (design spec §4: 페이지 그리드).
+ * One page rendered as a thumbnail card in the page grid.
  *
- * Two design-spec behaviours live here:
+ * Two behaviours live here:
  *
- * - **Lazy render (§6, 대용량 파일 UI 멈춤 방지).** The heavy pdf.js rasterise is
- *   deferred until the card actually approaches the viewport, observed via
- *   `IntersectionObserver`. A workspace with hundreds of pages therefore only
- *   rasterises what the user can (nearly) see, keeping scroll responsive.
- * - **Source colour tag (§4/§5, 출처 파일별 색 태그).** Each card carries the
- *   categorical colour assigned to its origin file so the user can tell at a
- *   glance which PDF a page came from. The colour is a design-token reference
- *   ({@link SourceColor.cssVar}) — no raw hex reaches this component.
+ * - **Thumbnail lazy render.** The heavy pdf.js rasterise is deferred until the
+ *   card actually approaches the viewport, observed via `IntersectionObserver`.
+ *   A workspace with hundreds of pages therefore only rasterises what the user
+ *   can (nearly) see, keeping scroll responsive on large files.
+ * - **Source colour tag.** Each card carries the categorical colour assigned to
+ *   its origin file so the user can tell at a glance which PDF a page came from.
+ *   The colour is a design-token reference ({@link SourceColor.cssVar}) — no raw
+ *   hex reaches this component.
  *
  * Presentational + orchestration only: the actual raster is produced by the
- * grain-1 {@link ThumbnailRenderer}, injected so the parent can share one
- * document cache across every card.
+ * injected {@link ThumbnailRenderer}, so the parent can share one document cache
+ * across every card.
  */
 export interface PageThumbnailCardProps {
   /** SSoT page id — the sortable item id dnd-kit reorders on ({@link WorkspacePage.id}). */
@@ -40,7 +41,7 @@ export interface PageThumbnailCardProps {
   color: SourceColor
   /** Desired thumbnail width in device pixels. */
   targetWidth: number
-  /** Shared pdf.js-backed rasteriser (grain-1). */
+  /** Shared pdf.js-backed rasteriser. */
   renderer: ThumbnailRenderer
   /**
    * Absolute orientation of this page in degrees (multiple of 90). Applied as a
@@ -130,7 +131,7 @@ export default function PageThumbnailCard({
   const [visible, setVisible] = useState(false)
   const [state, setState] = useState<RenderState>({ status: 'idle' })
 
-  // Sortable wiring (grain-2). `useSortable` supplies the drag handle listeners,
+  // Sortable wiring. `useSortable` supplies the drag handle listeners,
   // the live transform that slides this card as siblings are reordered, and the
   // `isDragging` flag that drives the lifted drag-state styling. The reorder
   // itself is committed by the grid's `onDragEnd` against the SSoT `pages`
@@ -200,8 +201,8 @@ export default function PageThumbnailCard({
         if (!cancelled) setState({ status: 'ready', dataUrl: thumbnail.dataUrl })
       })
       .catch(() => {
-        // A single page failing to render must not corrupt the workspace
-        // (§6): surface it on the card and leave every other page intact.
+        // A single page failing to render must not corrupt the workspace:
+        // surface it on the card and leave every other page intact.
         if (!cancelled) setState({ status: 'error' })
       })
 
@@ -229,17 +230,17 @@ export default function PageThumbnailCard({
             className="page-card__image"
             style={{ transform: `rotate(${rotation}deg)` }}
             src={state.dataUrl}
-            alt={`${sourceName} ${pageLabel}페이지 미리보기`}
+            alt={strings.pageCard.previewAlt(sourceName, pageLabel)}
             loading="lazy"
           />
         ) : state.status === 'error' ? (
-          <span className="page-card__status page-card__status--error" role="img" aria-label="미리보기를 불러오지 못했습니다">
+          <span className="page-card__status page-card__status--error" role="img" aria-label={strings.pageCard.previewError}>
             !
           </span>
         ) : (
           <span
             className="page-card__status"
-            aria-label="미리보기 준비 중"
+            aria-label={strings.pageCard.previewLoading}
             role="status"
           >
             <span className="page-card__spinner" aria-hidden="true" />
@@ -261,7 +262,7 @@ export default function PageThumbnailCard({
             className="page-card__checkbox"
             checked={selected}
             onChange={() => onToggleSelect(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 선택`}
+            aria-label={strings.pageCard.selectPage(sourceName, pageLabel)}
           />
         </label>
 
@@ -276,7 +277,7 @@ export default function PageThumbnailCard({
             type="button"
             className="icon-btn"
             onClick={() => onRotate(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 90도 회전`}
+            aria-label={strings.pageCard.rotatePage(sourceName, pageLabel)}
           >
             <RotateIcon />
           </button>
@@ -284,7 +285,7 @@ export default function PageThumbnailCard({
             type="button"
             className="icon-btn icon-btn--danger"
             onClick={() => onDelete(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 삭제`}
+            aria-label={strings.pageCard.deletePage(sourceName, pageLabel)}
           >
             <TrashIcon />
           </button>

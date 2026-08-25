@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for the toolbar's 선택 페이지 내보내기 (extract) wiring (grain-1).
+ * Smoke tests for the toolbar's Export Selected Pages (extract) wiring (grain-1).
  *
  * These cover the toolbar's *contract*, not its internals: the button is
  * disabled with no selection, enabled with one, and on click hands the checked
@@ -44,17 +44,17 @@ function renderToolbar(overrides: Partial<React.ComponentProps<typeof Toolbar>> 
 }
 
 const selectedExportButton = () =>
-  screen.getByRole('button', { name: '선택 페이지 내보내기' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Export Selected Pages' }) as HTMLButtonElement
 
 // Split controls use a stable aria-label so accessors survive the busy label swap.
-const countField = () => screen.getByLabelText('분할할 페이지 수') as HTMLInputElement
-const rangeField = () => screen.getByLabelText('분할 범위') as HTMLInputElement
+const countField = () => screen.getByLabelText('Pages per split') as HTMLInputElement
+const rangeField = () => screen.getByLabelText('Split range') as HTMLInputElement
 const splitCountButton = () =>
-  screen.getByRole('button', { name: 'N페이지 단위 분할' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Split by N pages' }) as HTMLButtonElement
 const splitRangesButton = () =>
-  screen.getByRole('button', { name: '범위 지정 분할' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Split by range' }) as HTMLButtonElement
 
-describe('Toolbar — 선택 페이지 내보내기', () => {
+describe('Toolbar — Export Selected Pages', () => {
   it('is disabled when no pages are selected', () => {
     renderToolbar({ selectedPages: [], selectedCount: 0 })
     expect(selectedExportButton().disabled).toBe(true)
@@ -84,7 +84,7 @@ describe('Toolbar — 선택 페이지 내보내기', () => {
   })
 })
 
-describe('Toolbar — N페이지 단위 분할', () => {
+describe('Toolbar — Split by N Pages', () => {
   it('is disabled until a positive page count is entered', () => {
     renderToolbar()
     expect(splitCountButton().disabled).toBe(true)
@@ -119,7 +119,7 @@ describe('Toolbar — N페이지 단위 분할', () => {
   })
 })
 
-describe('Toolbar — 범위 지정 분할', () => {
+describe('Toolbar — Split by Range', () => {
   it('is disabled while the range field is empty', () => {
     renderToolbar()
     expect(splitRangesButton().disabled).toBe(true)
@@ -153,8 +153,8 @@ describe('Toolbar — 범위 지정 분할', () => {
   })
 
   // Each classified parseRange failure must surface *its own* inline message,
-  // disable 범위 분할, and block the export (design spec §6, grain-2 DoneWhen:
-  // "잘못된 범위 각 케이스에서 인라인 메시지가 표시되고 버튼이 비활성화").
+  // disable range split, and block the export (each invalid-range case shows an
+  // inline message and disables the button).
   // pages.length is 2 here, so the fixtures below map to each RangeErrorKind.
   const INVALID_RANGE_CASES: ReadonlyArray<{
     kind: string
@@ -163,9 +163,9 @@ describe('Toolbar — 범위 지정 분할', () => {
   }> = [
     // 'empty' shows no alert (a blank field is not yet a mistake); covered by
     // the dedicated "disabled while the range field is empty" test above.
-    { kind: 'invalid-token', input: 'abc', expectedFragment: '올바른 범위 형식이 아닙니다' },
-    { kind: 'reversed-range', input: '2-1', expectedFragment: '앞섭니다' },
-    { kind: 'out-of-range', input: '3', expectedFragment: '문서 범위를 벗어났습니다' },
+    { kind: 'invalid-token', input: 'abc', expectedFragment: 'is not a valid page range' },
+    { kind: 'reversed-range', input: '2-1', expectedFragment: 'ends before it starts' },
+    { kind: 'out-of-range', input: '3', expectedFragment: 'is outside the document' },
   ]
 
   it.each(INVALID_RANGE_CASES)(
@@ -212,7 +212,7 @@ describe('Toolbar — in-flight guard', () => {
     expect(splitRangesButton().disabled).toBe(true)
     expect(selectedExportButton().disabled).toBe(true)
     expect(
-      (screen.getByRole('button', { name: '전체 내보내기' }) as HTMLButtonElement)
+      (screen.getByRole('button', { name: 'Export All' }) as HTMLButtonElement)
         .disabled,
     ).toBe(true)
     // Inputs lock too, so the running split can't be re-parameterised mid-run.
