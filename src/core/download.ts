@@ -13,6 +13,32 @@
  *
  * This module emits and packages bytes only; producing the merged PDF bytes is
  * `merge.ts`'s job (out of scope here).
+ *
+ * ## Download filename convention (user-observable)
+ *
+ * These are the exact names a user sees in their downloads folder. Template
+ * forkers can change any of them from one place — the `filenames` group in
+ * `strings` — without touching the logic here. The separators (`-`), the "first
+ * base then marker" order, and the split zero-padding are part of the contract
+ * and are preserved; only the wording is configurable.
+ *
+ * - **Merge / export all** ({@link buildExportFilename}):
+ *   - one usable source → that name normalized to `.pdf` (e.g. `report.pdf`);
+ *   - several usable sources → first base + `+N more` marker, where `N` counts
+ *     the sources after the first, e.g. `["a.pdf","b.pdf","c.pdf"]` →
+ *     `a-+2 more.pdf`;
+ *   - no usable source → `merged.pdf` (the `merge` fallback).
+ * - **Export selected pages** ({@link buildExportFilename} with a caller-supplied
+ *   `fallback`): same rule as merge, but when no source name is usable the
+ *   fallback is `selected-pages.pdf` (see `strings.filenames.selectedPagesFallback`).
+ * - **Split (by N pages / by range)** ({@link buildSplitFilenames}): each part is
+ *   `<base>-<n>.pdf`, `n` 1-based and zero-padded to the part count's width
+ *   (e.g. `report-01.pdf` … `report-12.pdf`); when the base is unusable the
+ *   `split` fallback yields `split-1.pdf`, `split-2.pdf`, …
+ *
+ * The marker/fallback wording moved from Korean to English (`-외N개` → `+N more`,
+ * `선택페이지` → `selected-pages`) when this tool became a reusable template;
+ * separators and order were kept, so the change is copy-only.
  */
 
 import { strings } from '../strings'
