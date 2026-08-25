@@ -1,20 +1,25 @@
 /**
- * Pure `sourceFiles` → `WorkspacePage[]` derivation (design spec S-00011 §5).
+ * Workspace page model plus the reorder, rotate, and delete features.
  *
  * The page grid lists *every* page of *every* loaded file in one flat grid. This
  * module is the single place that flattens the loaded documents into the ordered
- * `pages` array that later becomes the workspace SSoT for order/rotation/deletion.
+ * `pages` array that becomes the workspace SSoT, and it owns the pure operations
+ * that edit that array:
  *
- * It is intentionally React-, DOM- and pdf.js-free so the flattening rules can be
- * unit tested in plain Node. Rendering (pdf.js) and colour assignment
- * (`source-color`) live in their own modules; this one only decides *which* pages
- * exist and in what order.
+ * - **Reorder** — {@link reorderPages} drag-moves a page to a new slot.
+ * - **Rotate** — {@link rotatePage} steps one page 90° clockwise.
+ * - **Delete** — {@link deletePages} removes selected pages.
+ *
+ * It is intentionally React-, DOM- and pdf.js-free so the rules can be unit
+ * tested in plain Node. Rendering (pdf.js) and colour assignment (`source-color`)
+ * live in their own modules; every operation here returns a new array and never
+ * mutates the source bytes.
  */
 import type { SourceFile, WorkspacePage } from './types'
 
 /**
  * Rotation a freshly-derived page starts at. Absolute orientation in degrees;
- * later grains (rotate) mutate the SSoT `pages` array, never the source bytes.
+ * the rotate operation mutates the SSoT `pages` array, never the source bytes.
  */
 export const DEFAULT_PAGE_ROTATION = 0
 
