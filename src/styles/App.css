@@ -708,6 +708,145 @@
   color: var(--color-text-secondary);
 }
 
+/* ── Help dialog ────────────────────────────────────────────── */
+/* Unified help modal (spec: 기능별 도움말 시스템, 통합 도움말 화면). All design
+ * values come from tokens; the fixed full-viewport positioning, z-index and the
+ * panel's max-width / max-height (element dimensions) are implementation values. */
+.help-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background-color: var(--color-overlay-scrim);
+}
+
+.help-dialog__panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.help-dialog__panel:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), 0 0 0 2px var(--color-accent-soft);
+}
+
+.help-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.help-dialog__title {
+  margin: 0;
+  font-size: var(--text-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.help-dialog__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base)
+    var(--transition-easing-standard);
+}
+
+.help-dialog__close:hover {
+  color: var(--color-accent-primary);
+}
+
+.help-dialog__close:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.help-dialog__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.help-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.help-dialog__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-dialog__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help-dialog__item-title {
+  margin: 0;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.help-dialog__item-body {
+  margin: 0;
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
+.help-dialog__privacy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-md);
+}
+
+.help-dialog__privacy-title {
+  margin: 0;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-primary);
+}
+
+.help-dialog__privacy-body {
+  margin: 0;
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .app-header {
