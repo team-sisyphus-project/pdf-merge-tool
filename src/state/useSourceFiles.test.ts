@@ -45,11 +45,20 @@ function ok(name: string, pageCount: number): LoadResult {
 }
 
 function corrupt(): LoadResult {
-  return { ok: false, error: { kind: 'corrupt', message: '손상' } }
+  return {
+    ok: false,
+    error: { kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
+  }
 }
 
 function encrypted(): LoadResult {
-  return { ok: false, error: { kind: 'encrypted', message: '암호' } }
+  return {
+    ok: false,
+    error: {
+      kind: 'encrypted',
+      message: 'This PDF is password-protected. Remove the password and try again.',
+    },
+  }
 }
 
 describe('loadFiles', () => {
@@ -101,8 +110,12 @@ describe('loadFiles', () => {
 
     expect(added.map((f) => f.name)).toEqual(['good.pdf'])
     expect(rejected).toEqual([
-      { name: 'locked.pdf', kind: 'encrypted', message: '암호' },
-      { name: 'broken.pdf', kind: 'corrupt', message: '손상' },
+      {
+        name: 'locked.pdf',
+        kind: 'encrypted',
+        message: 'This PDF is password-protected. Remove the password and try again.',
+      },
+      { name: 'broken.pdf', kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
     ])
   })
 
