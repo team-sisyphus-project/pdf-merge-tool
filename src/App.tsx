@@ -12,6 +12,7 @@ import { parseRangeGroups, planSplitDownload } from './core/split-plan'
 import type { SourceFile, WorkspacePage } from './core/types'
 import { useSourceFiles } from './state/useSourceFiles'
 import { useWorkspacePages } from './state/useWorkspacePages'
+import { strings } from './strings'
 import './styles/App.css'
 
 /**
@@ -85,7 +86,9 @@ export default function App() {
         const name = nameById.get(page.sourceFileId)
         if (name) sourceNames.push(name)
       }
-      const filename = buildExportFilename(sourceNames, { fallback: '선택페이지' })
+      const filename = buildExportFilename(sourceNames, {
+        fallback: strings.filename.selectedFallback,
+      })
       downloadPdf(bytes, filename)
     },
     [],

@@ -57,3 +57,23 @@ npm run preview  # 빌드 산출물 로컬 미리보기
 
 `npm run build`는 `dist/`에 정적 산출물을 만들고, `npm run preview`는 이를 로컬에서
 서빙합니다. 프리뷰 런타임은 `dist/`를 자동으로 감지해 서빙합니다.
+
+## Download file-name rules
+
+Generated download names are derived deterministically from the source files
+(`src/core/download.ts`). All user-observable markers are English (centralised in
+`src/strings.ts`):
+
+- **Merge export (Export All)** — named after the ordered source files:
+  - one source → that file's name, e.g. `report.pdf`;
+  - several sources → the first name plus an `and-N-more` suffix, where `N`
+    counts the remaining sources, e.g. `["a.pdf","b.pdf","c.pdf"]` →
+    `a-and-2-more.pdf`;
+  - no usable source name → the `merged.pdf` fallback.
+- **Export Selected Pages** — named after the source(s) the selection draws
+  from; when none is usable it falls back to `selected-pages.pdf`.
+- **Split parts** — `<base>-<n>.pdf` with the index zero-padded to the part
+  count (e.g. `report-01.pdf … report-12.pdf`); unusable base → `split-*.pdf`.
+
+Names are stripped of directory prefixes and characters reserved on common
+platforms (`< > : " | ? *`).

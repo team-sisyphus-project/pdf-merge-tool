@@ -88,4 +88,50 @@ export const strings = {
     ariaLabel: 'Page preview',
     title: (count: number): string => `${count} ${pageWord(count)}`,
   },
+
+  /**
+   * Core range-parser inline errors. Each string maps to one distinct parse
+   * failure; tone stays calm and recoverable (states the problem, then how to
+   * fix it) to match the rest of the app's error copy.
+   */
+  rangeError: {
+    empty: 'Enter a page range. For example: 1-3, 7, 10-12',
+    invalidToken: (token: string): string =>
+      `'${token}' is not a valid page range. ` +
+      `Use page numbers and ranges starting at 1, for example: 1-3, 7.`,
+    reversedRange: (start: number, end: number): string =>
+      `Range ${start}-${end} ends before it starts. ` +
+      `Enter the start on or before the end.`,
+    outOfRange: (page: number, pageCount: number): string =>
+      `Page ${page} is outside the document. ` +
+      `This document has ${pageCount} ${pageWord(pageCount)}.`,
+  },
+
+  /** Core PDF-loading errors, one per distinct rejection reason. */
+  loadError: {
+    encrypted:
+      'This PDF is password-protected. Remove the password and try again.',
+    corrupt: 'This file is damaged or is not a valid PDF.',
+  },
+
+  /**
+   * Markers embedded in generated download file names. These are directly
+   * observable by the user in their downloads, so they live in the same copy
+   * catalogue as on-screen text.
+   */
+  filename: {
+    /**
+     * Suffix appended after the first source name when a merge export draws
+     * from several files, e.g. three files → `first-and-2-more.pdf`. Hyphen-
+     * joined so the whole file name stays space-free and sorts cleanly.
+     */
+    moreSources: (extra: number): string => `and-${extra}-more`,
+    /** Fallback base name for the "export selected pages" download. */
+    selectedFallback: 'selected-pages',
+  },
+
+  /** Developer-facing diagnostics emitted during app bootstrap. */
+  boot: {
+    rootMissing: 'Root element (#root) was not found.',
+  },
 } as const
