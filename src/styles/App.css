@@ -638,6 +638,76 @@
   white-space: nowrap;
 }
 
+/* ── Info tooltip ───────────────────────────────────────────── */
+/* Per-feature ⓘ help icon + its popover (spec: 기능별 도움말 시스템). All design
+ * values come from tokens; position/z-index and the popover max-width (an element
+ * dimension, like other sized elements here) are direct implementation values. */
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.info-tooltip__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base)
+    var(--transition-easing-standard);
+}
+
+.info-tooltip__trigger:hover,
+.info-tooltip__trigger[aria-expanded='true'] {
+  color: var(--color-accent-primary);
+}
+
+.info-tooltip__trigger:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.info-tooltip__trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.info-tooltip__popover {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: max-content;
+  max-width: 260px;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.info-tooltip__title {
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.info-tooltip__body {
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .app-header {
