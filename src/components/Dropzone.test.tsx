@@ -77,7 +77,7 @@ describe('Dropzone load errors', () => {
   it('calls onDismissRejected when the dismiss control is clicked', () => {
     const { onDismissRejected } = renderDropzone({ rejected: REJECTED })
 
-    fireEvent.click(screen.getByText('닫기'))
+    fireEvent.click(screen.getByText('Dismiss'))
 
     expect(onDismissRejected).toHaveBeenCalledTimes(1)
   })

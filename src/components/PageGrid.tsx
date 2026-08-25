@@ -17,6 +17,7 @@ import { assignSourceColors } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import PageThumbnailCard from './PageThumbnailCard'
+import { strings } from '../strings'
 
 /**
  * The unified page grid (design spec §4): every page of every loaded file laid
@@ -116,8 +117,8 @@ export default function PageGrid({
   if (pages.length === 0) return null
 
   return (
-    <section className="page-grid-section" aria-label="페이지 미리보기">
-      <h3 className="page-grid__title">페이지 {pages.length}개</h3>
+    <section className="page-grid-section" aria-label={strings.pageGrid.ariaLabel}>
+      <h3 className="page-grid__title">{strings.pageGrid.title(pages.length)}</h3>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
