@@ -61,6 +61,13 @@
   color: var(--color-text-secondary);
 }
 
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
 .app-header__job-badge {
   flex-shrink: 0;
   padding: var(--space-xs) var(--space-sm);
@@ -71,6 +78,46 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-full);
   white-space: nowrap;
+}
+
+.app-header__help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base) var(--transition-easing-standard),
+    background-color var(--transition-duration-base) var(--transition-easing-standard),
+    border-color var(--transition-duration-base) var(--transition-easing-standard);
+}
+
+.app-header__help svg {
+  width: 20px;
+  height: 20px;
+}
+
+.app-header__help:hover {
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+.app-header__help:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.app-header__help[aria-expanded='true'] {
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent-primary);
 }
 
 /* ── Toolbar ────────────────────────────────────────────────── */
