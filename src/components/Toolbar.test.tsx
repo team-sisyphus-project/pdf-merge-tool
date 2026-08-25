@@ -54,7 +54,7 @@ const splitCountButton = () =>
 const splitRangesButton = () =>
   screen.getByRole('button', { name: 'Split by range' }) as HTMLButtonElement
 
-describe('Toolbar — 선택 페이지 내보내기', () => {
+describe('Toolbar — Export Selected Pages', () => {
   it('is disabled when no pages are selected', () => {
     renderToolbar({ selectedPages: [], selectedCount: 0 })
     expect(selectedExportButton().disabled).toBe(true)
@@ -84,7 +84,7 @@ describe('Toolbar — 선택 페이지 내보내기', () => {
   })
 })
 
-describe('Toolbar — N페이지 단위 분할', () => {
+describe('Toolbar — Split by N pages', () => {
   it('is disabled until a positive page count is entered', () => {
     renderToolbar()
     expect(splitCountButton().disabled).toBe(true)
@@ -119,7 +119,7 @@ describe('Toolbar — N페이지 단위 분할', () => {
   })
 })
 
-describe('Toolbar — 범위 지정 분할', () => {
+describe('Toolbar — Split by range', () => {
   it('is disabled while the range field is empty', () => {
     renderToolbar()
     expect(splitRangesButton().disabled).toBe(true)

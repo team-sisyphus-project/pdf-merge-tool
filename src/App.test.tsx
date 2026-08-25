@@ -75,7 +75,7 @@ function pdfFile(name = 'sample.pdf'): File {
 }
 
 describe('App workspace smoke flow', () => {
-  it('goes 전체 내보내기 disabled → load file → grid shown → button enabled', async () => {
+  it('goes Export All disabled → load file → grid shown → button enabled', async () => {
     vi.stubGlobal('IntersectionObserver', NoopIntersectionObserver)
 
     const { container } = render(<App />)
