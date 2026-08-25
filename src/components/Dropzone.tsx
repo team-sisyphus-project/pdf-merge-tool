@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import type { SourceFile } from '../core/types'
 import type { RejectedFile } from '../state/useSourceFiles'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * PDF loading surface (design spec §4). Accepts files by drag-and-drop or the
@@ -129,6 +130,10 @@ export default function Dropzone({
         />
         <p className="dropzone__note">
           모든 처리는 브라우저 안에서만 이루어집니다.
+          {/* Feature help for the whole load surface (spec §Dropzone): drag-or-
+              pick, multi-file append order, local-only processing. Last sibling
+              of the notice so it reads as a trailing "more info" affordance. */}
+          <InfoTooltip helpKey="dropzone" />
         </p>
       </section>
 

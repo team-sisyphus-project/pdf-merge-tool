@@ -17,6 +17,7 @@ import { assignSourceColors } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import PageThumbnailCard from './PageThumbnailCard'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * The unified page grid (design spec §4): every page of every loaded file laid
@@ -117,7 +118,13 @@ export default function PageGrid({
 
   return (
     <section className="page-grid-section" aria-label="페이지 미리보기">
-      <h3 className="page-grid__title">페이지 {pages.length}개</h3>
+      <h3 className="page-grid__title">
+        페이지 {pages.length}개
+        {/* Grid-top help for drag reorder (spec §페이지 그리드 상단): dragging a
+            thumbnail sets the final export order. Placed beside the grid title
+            so it explains the grid as a whole, not any one card. */}
+        <InfoTooltip helpKey="reorder" />
+      </h3>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

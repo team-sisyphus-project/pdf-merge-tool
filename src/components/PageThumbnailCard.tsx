@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { SourceColor } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * One page rendered as a thumbnail card (design spec §4: 페이지 그리드).
@@ -288,6 +289,11 @@ export default function PageThumbnailCard({
           >
             <TrashIcon />
           </button>
+          {/* One tooltip explains both rotate (누적 90°) and delete (작업 화면
+              한정, 되돌리기 불가) — it sits inside `.page-card__actions`, so the
+              container's `stopDragGesture` guard already keeps the ⓘ from
+              starting a drag (no separate handler needed). */}
+          <InfoTooltip helpKey="delete" />
         </div>
       </div>
 
