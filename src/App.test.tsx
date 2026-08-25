@@ -82,10 +82,10 @@ describe('App workspace smoke flow', () => {
 
     // Before any file loads, the merge action is disabled and no grid exists.
     const exportButton = screen.getByRole('button', {
-      name: '전체 내보내기',
+      name: 'Export All',
     }) as HTMLButtonElement
     expect(exportButton.disabled).toBe(true)
-    expect(screen.queryByText(/^페이지 \d+개$/)).toBeNull()
+    expect(screen.queryByText(/^\d+ pages$/)).toBeNull()
 
     // The hidden file input inside the "PDF 불러오기 영역" drop surface.
     const input = container.querySelector(
@@ -98,12 +98,16 @@ describe('App workspace smoke flow', () => {
       fireEvent.change(input, { target: { files: [pdfFile()] } })
     })
 
-    // The page grid appears with a title reflecting the derived page count…
-    expect(await screen.findByText('페이지 2개')).toBeDefined()
+    // The page grid appears with a heading reflecting the derived page count.
+    // Queried by role so it can't collide with the Dropzone per-file page-count
+    // badge, which shares the same "N pages" wording in a different region.
+    expect(
+      await screen.findByRole('heading', { name: '2 pages' }),
+    ).toBeDefined()
 
     // …and the merge action has transitioned to enabled.
     const exportAfter = screen.getByRole('button', {
-      name: '전체 내보내기',
+      name: 'Export All',
     }) as HTMLButtonElement
     expect(exportAfter.disabled).toBe(false)
   })

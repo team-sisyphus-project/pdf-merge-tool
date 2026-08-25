@@ -21,6 +21,7 @@
 import { useState } from 'react'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import { parseRange } from '../core/range-parser'
+import { strings } from '../strings'
 
 /**
  * Inline copy shown when a merge/split/download pipeline throws. Kept generic on
@@ -29,7 +30,7 @@ import { parseRange } from '../core/range-parser'
  * the message stays a calm "try again" rather than leaking internals
  * (security.md §7, error messages must not reveal system internals).
  */
-const EXPORT_ERROR_MESSAGE = 'PDF를 만들지 못했어요. 잠시 후 다시 시도해 주세요.'
+const EXPORT_ERROR_MESSAGE = strings.errors.exportFailed
 
 /** Which action is currently running (`null` = idle). Used as the in-flight guard. */
 type ActionKind = 'all' | 'selected' | 'count' | 'ranges'
@@ -169,7 +170,7 @@ export default function Toolbar({
   const inputsDisabled = !hasPages || isBusy
 
   return (
-    <div className="toolbar" role="toolbar" aria-label="문서 작업 도구">
+    <div className="toolbar" role="toolbar" aria-label={strings.toolbar.regionLabel}>
       <div className="toolbar__group">
         <button
           type="button"
@@ -178,7 +179,7 @@ export default function Toolbar({
           aria-busy={exporting === 'all'}
           onClick={handleExportAll}
         >
-          {exporting === 'all' ? '내보내는 중…' : '전체 내보내기'}
+          {exporting === 'all' ? strings.toolbar.exporting : strings.toolbar.exportAll}
         </button>
         <button
           type="button"
@@ -187,7 +188,9 @@ export default function Toolbar({
           aria-busy={exporting === 'selected'}
           onClick={handleExportSelected}
         >
-          {exporting === 'selected' ? '내보내는 중…' : '선택 페이지 내보내기'}
+          {exporting === 'selected'
+            ? strings.toolbar.exporting
+            : strings.toolbar.exportSelected}
         </button>
       </div>
 
@@ -201,8 +204,8 @@ export default function Toolbar({
             className="field-input field-input--count"
             value={countInput}
             onChange={(event) => setCountInput(event.target.value)}
-            placeholder="예: 2"
-            aria-label="분할할 페이지 수"
+            placeholder={strings.toolbar.countPlaceholder}
+            aria-label={strings.toolbar.countFieldLabel}
             disabled={inputsDisabled}
           />
           <button
@@ -210,10 +213,10 @@ export default function Toolbar({
             className={`btn ${canSplitCount ? 'btn--primary' : 'btn--disabled'}`}
             disabled={!canSplitCount}
             aria-busy={exporting === 'count'}
-            aria-label="N페이지 단위 분할"
+            aria-label={strings.toolbar.splitByCountAction}
             onClick={handleSplitCount}
           >
-            {exporting === 'count' ? '분할 중…' : 'N단위 분할'}
+            {exporting === 'count' ? strings.toolbar.splitting : strings.toolbar.splitByCount}
           </button>
         </div>
 
@@ -225,8 +228,8 @@ export default function Toolbar({
             }`}
             value={rangeInput}
             onChange={(event) => setRangeInput(event.target.value)}
-            placeholder="예: 1-3, 7, 10-12"
-            aria-label="분할 범위"
+            placeholder={strings.toolbar.rangePlaceholder}
+            aria-label={strings.toolbar.rangeFieldLabel}
             aria-invalid={rangeError ? true : undefined}
             disabled={inputsDisabled}
           />
@@ -235,10 +238,10 @@ export default function Toolbar({
             className={`btn ${canSplitRanges ? 'btn--primary' : 'btn--disabled'}`}
             disabled={!canSplitRanges}
             aria-busy={exporting === 'ranges'}
-            aria-label="범위 지정 분할"
+            aria-label={strings.toolbar.splitByRangeAction}
             onClick={handleSplitRanges}
           >
-            {exporting === 'ranges' ? '분할 중…' : '범위 분할'}
+            {exporting === 'ranges' ? strings.toolbar.splitting : strings.toolbar.splitByRange}
           </button>
         </div>
       </div>
@@ -251,13 +254,11 @@ export default function Toolbar({
 
       {selectedCount > 0 ? (
         <p className="toolbar__selection" aria-live="polite">
-          선택 {selectedCount}개
+          {strings.toolbar.selectionCount(selectedCount)}
         </p>
       ) : (
         <p className="toolbar__hint">
-          {hasPages
-            ? '전체 내보내기·분할로 PDF를 저장할 수 있어요.'
-            : 'PDF를 불러오면 도구가 활성화됩니다.'}
+          {hasPages ? strings.toolbar.hintReady : strings.toolbar.hintEmpty}
         </p>
       )}
       {error ? (

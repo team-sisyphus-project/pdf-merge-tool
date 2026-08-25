@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { SourceColor } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
+import { strings } from '../strings'
 
 /**
  * One page rendered as a thumbnail card (design spec §4: 페이지 그리드).
@@ -229,17 +230,17 @@ export default function PageThumbnailCard({
             className="page-card__image"
             style={{ transform: `rotate(${rotation}deg)` }}
             src={state.dataUrl}
-            alt={`${sourceName} ${pageLabel}페이지 미리보기`}
+            alt={strings.pageCard.previewAlt(sourceName, pageLabel)}
             loading="lazy"
           />
         ) : state.status === 'error' ? (
-          <span className="page-card__status page-card__status--error" role="img" aria-label="미리보기를 불러오지 못했습니다">
+          <span className="page-card__status page-card__status--error" role="img" aria-label={strings.pageCard.previewFailed}>
             !
           </span>
         ) : (
           <span
             className="page-card__status"
-            aria-label="미리보기 준비 중"
+            aria-label={strings.pageCard.previewLoading}
             role="status"
           >
             <span className="page-card__spinner" aria-hidden="true" />
@@ -261,7 +262,7 @@ export default function PageThumbnailCard({
             className="page-card__checkbox"
             checked={selected}
             onChange={() => onToggleSelect(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 선택`}
+            aria-label={strings.pageCard.selectPage(sourceName, pageLabel)}
           />
         </label>
 
@@ -276,7 +277,7 @@ export default function PageThumbnailCard({
             type="button"
             className="icon-btn"
             onClick={() => onRotate(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 90도 회전`}
+            aria-label={strings.pageCard.rotatePage(sourceName, pageLabel)}
           >
             <RotateIcon />
           </button>
@@ -284,7 +285,7 @@ export default function PageThumbnailCard({
             type="button"
             className="icon-btn icon-btn--danger"
             onClick={() => onDelete(id)}
-            aria-label={`${sourceName} ${pageLabel}페이지 삭제`}
+            aria-label={strings.pageCard.deletePage(sourceName, pageLabel)}
           >
             <TrashIcon />
           </button>

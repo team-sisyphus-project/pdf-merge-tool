@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import type { SourceFile } from '../core/types'
 import type { RejectedFile } from '../state/useSourceFiles'
+import { strings } from '../strings'
 
 /**
  * PDF loading surface (design spec §4). Accepts files by drag-and-drop or the
@@ -19,8 +20,6 @@ export interface DropzoneProps {
   onAddFiles: (files: File[]) => void
   onDismissRejected: () => void
 }
-
-const PAGE_LABEL = (count: number) => `${count}페이지`
 
 export default function Dropzone({
   sourceFiles,
@@ -89,7 +88,7 @@ export default function Dropzone({
     <>
       <section
         className={dropClasses}
-        aria-label="PDF 불러오기 영역"
+        aria-label={strings.dropzone.regionLabel}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -103,19 +102,20 @@ export default function Dropzone({
           </svg>
         </div>
         <h2 className="dropzone__title">
-          {hasFiles ? 'PDF를 더 끌어다 놓으세요' : 'PDF를 여기에 끌어다 놓으세요'}
+          {hasFiles ? strings.dropzone.dropMoreTitle : strings.dropzone.dropTitle}
         </h2>
-        <p className="dropzone__desc">
-          또는 아래 버튼으로 파일을 선택하세요. 여러 개를 한 번에 불러올 수
-          있습니다.
-        </p>
+        <p className="dropzone__desc">{strings.dropzone.description}</p>
         <button
           type="button"
           className="btn btn--primary"
           onClick={openPicker}
           disabled={isLoading}
         >
-          {isLoading ? '불러오는 중…' : hasFiles ? '파일 추가' : '파일 선택'}
+          {isLoading
+            ? strings.dropzone.loading
+            : hasFiles
+              ? strings.dropzone.addFiles
+              : strings.dropzone.chooseFiles}
         </button>
         <input
           ref={inputRef}
@@ -127,23 +127,21 @@ export default function Dropzone({
           aria-hidden="true"
           tabIndex={-1}
         />
-        <p className="dropzone__note">
-          모든 처리는 브라우저 안에서만 이루어집니다.
-        </p>
+        <p className="dropzone__note">{strings.dropzone.privacyNote}</p>
       </section>
 
       {rejected.length > 0 && (
         <div className="load-errors" role="alert">
           <div className="load-errors__head">
             <span className="load-errors__title">
-              불러오지 못한 파일 {rejected.length}개
+              {strings.dropzone.rejectedTitle(rejected.length)}
             </span>
             <button
               type="button"
               className="load-errors__dismiss"
               onClick={onDismissRejected}
             >
-              닫기
+              {strings.dropzone.dismiss}
             </button>
           </div>
           <ul className="load-errors__list">
@@ -158,9 +156,9 @@ export default function Dropzone({
       )}
 
       {hasFiles && (
-        <section className="source-list" aria-label="불러온 파일 목록">
+        <section className="source-list" aria-label={strings.dropzone.sourceListLabel}>
           <h3 className="source-list__title">
-            불러온 파일 {sourceFiles.length}개
+            {strings.dropzone.sourceListTitle(sourceFiles.length)}
           </h3>
           <ul className="source-list__items">
             {sourceFiles.map((file) => (
@@ -173,7 +171,7 @@ export default function Dropzone({
                 </span>
                 <span className="source-list__name">{file.name}</span>
                 <span className="source-list__pages">
-                  {PAGE_LABEL(file.pageCount)}
+                  {strings.dropzone.pageCount(file.pageCount)}
                 </span>
               </li>
             ))}

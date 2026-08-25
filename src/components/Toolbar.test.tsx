@@ -44,15 +44,15 @@ function renderToolbar(overrides: Partial<React.ComponentProps<typeof Toolbar>> 
 }
 
 const selectedExportButton = () =>
-  screen.getByRole('button', { name: '선택 페이지 내보내기' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Export Selected Pages' }) as HTMLButtonElement
 
 // Split controls use a stable aria-label so accessors survive the busy label swap.
-const countField = () => screen.getByLabelText('분할할 페이지 수') as HTMLInputElement
-const rangeField = () => screen.getByLabelText('분할 범위') as HTMLInputElement
+const countField = () => screen.getByLabelText('Pages per split') as HTMLInputElement
+const rangeField = () => screen.getByLabelText('Split range') as HTMLInputElement
 const splitCountButton = () =>
-  screen.getByRole('button', { name: 'N페이지 단위 분할' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Split by N pages' }) as HTMLButtonElement
 const splitRangesButton = () =>
-  screen.getByRole('button', { name: '범위 지정 분할' }) as HTMLButtonElement
+  screen.getByRole('button', { name: 'Split by range' }) as HTMLButtonElement
 
 describe('Toolbar — 선택 페이지 내보내기', () => {
   it('is disabled when no pages are selected', () => {
@@ -212,7 +212,7 @@ describe('Toolbar — in-flight guard', () => {
     expect(splitRangesButton().disabled).toBe(true)
     expect(selectedExportButton().disabled).toBe(true)
     expect(
-      (screen.getByRole('button', { name: '전체 내보내기' }) as HTMLButtonElement)
+      (screen.getByRole('button', { name: 'Export All' }) as HTMLButtonElement)
         .disabled,
     ).toBe(true)
     // Inputs lock too, so the running split can't be re-parameterised mid-run.

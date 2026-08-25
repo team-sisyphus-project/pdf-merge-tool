@@ -3,6 +3,8 @@
  * The badge shows the interim project code (`s00011-pdftool`) until a brand
  * name is confirmed (design spec §1).
  */
+import { strings } from '../strings'
+
 export default function AppHeader() {
   return (
     <header className="app-header">
@@ -16,10 +18,8 @@ export default function AppHeader() {
           </svg>
         </span>
         <div>
-          <h1 className="app-header__title">PDF 워크스페이스</h1>
-          <p className="app-header__subtitle">
-            브라우저에서 바로 처리 · 파일은 서버로 전송되지 않습니다
-          </p>
+          <h1 className="app-header__title">{strings.header.title}</h1>
+          <p className="app-header__subtitle">{strings.header.subtitle}</p>
         </div>
       </div>
       <span className="app-header__job-badge">s00011-pdftool</span>
