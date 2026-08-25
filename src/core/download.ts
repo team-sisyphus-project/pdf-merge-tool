@@ -36,9 +36,10 @@
  *   (e.g. `report-01.pdf` … `report-12.pdf`); when the base is unusable the
  *   `split` fallback yields `split-1.pdf`, `split-2.pdf`, …
  *
- * The marker/fallback wording moved from Korean to English (`-외N개` → `+N more`,
- * `선택페이지` → `selected-pages`) when this tool became a reusable template;
- * separators and order were kept, so the change is copy-only.
+ * The marker/fallback wording is English (`+N more` for the merge marker,
+ * `selected-pages` for the extract fallback); when this tool became a reusable
+ * template only that wording changed — separators and order were kept, so the
+ * change is copy-only.
  */
 
 import { strings } from '../strings'

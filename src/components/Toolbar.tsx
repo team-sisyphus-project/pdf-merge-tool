@@ -61,7 +61,7 @@ export interface ToolbarProps {
   /**
    * Splits every `count` pages into their own PDF, bundling multiple results as
    * a zip (owned by {@link App}). Optional so the toolbar renders (with the
-   * control disabled) until the App wires the pipeline in a later grain.
+   * control disabled) until the App wires the pipeline in.
    */
   onSplitByCount?: (
     count: number,

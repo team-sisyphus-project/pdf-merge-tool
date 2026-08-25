@@ -17,7 +17,7 @@ export interface RejectedFile {
   name: string
   /** Why it was rejected — mirrors the core {@link LoadErrorKind}. */
   kind: LoadErrorKind
-  /** Human-facing Korean message suitable for inline display. */
+  /** Human-facing message suitable for inline display. */
   message: string
 }
 
@@ -34,8 +34,8 @@ export interface LoadFilesDeps {
 }
 
 /**
- * Generates a stable id for a source file. The state layer owns identity so a
- * later grain can link pages back to their origin regardless of load order.
+ * Generates a stable id for a source file. The state layer owns identity so
+ * pages can link back to their origin regardless of load order.
  */
 export function createSourceId(): string {
   const c = (globalThis as { crypto?: Crypto }).crypto
