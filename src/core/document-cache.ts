@@ -1,6 +1,6 @@
 /**
  * A small promise-keyed cache used to load each source PDF document at most
- * once (design spec S-00011 §5: "pdf.js로 썸네일 비동기 렌더 … 파일 로드 캐시").
+ * once, so lazily-rendered thumbnails reuse a single load per source file.
  *
  * Kept free of any pdf.js dependency so the caching contract — dedup concurrent
  * loads, memoise the resolved value, and evict a failed load so it can be
