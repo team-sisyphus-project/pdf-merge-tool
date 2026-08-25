@@ -77,7 +77,7 @@ export default function App() {
       const bytes = await extractPages(pagesToExport, files)
       const nameById = new Map(files.map((file) => [file.id, file.name]))
       // Distinct origin file names in first-seen order; blanks are skipped so
-      // buildExportFilename applies the 선택페이지 fallback when none remain.
+      // buildExportFilename applies the selected-pages fallback when none remain.
       const sourceNames: string[] = []
       const seen = new Set<string>()
       for (const page of pagesToExport) {
