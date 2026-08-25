@@ -46,17 +46,17 @@ describe('buildExportFilename — single source', () => {
 })
 
 describe('buildExportFilename — multiple sources', () => {
-  it('marks two sources with 외1개 after the first name', () => {
-    expect(buildExportFilename(['a.pdf', 'b.pdf'])).toBe('a-외1개.pdf')
+  it('marks two sources with "+1 more" after the first name', () => {
+    expect(buildExportFilename(['a.pdf', 'b.pdf'])).toBe('a-+1 more.pdf')
   })
 
-  it('counts all but the first for the 외N개 marker', () => {
-    expect(buildExportFilename(['a.pdf', 'b.pdf', 'c.pdf'])).toBe('a-외2개.pdf')
+  it('counts all but the first for the "+N more" marker', () => {
+    expect(buildExportFilename(['a.pdf', 'b.pdf', 'c.pdf'])).toBe('a-+2 more.pdf')
   })
 
   it('ignores blank entries when counting usable sources', () => {
-    // Two usable names (a, b) despite the blank → single "외1개" marker.
-    expect(buildExportFilename(['a.pdf', '', 'b.pdf'])).toBe('a-외1개.pdf')
+    // Two usable names (a, b) despite the blank → single "+1 more" marker.
+    expect(buildExportFilename(['a.pdf', '', 'b.pdf'])).toBe('a-+1 more.pdf')
   })
 
   it('degrades to a single name when only one entry is usable', () => {

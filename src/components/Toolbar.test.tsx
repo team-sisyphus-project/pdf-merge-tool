@@ -163,9 +163,9 @@ describe('Toolbar — 범위 지정 분할', () => {
   }> = [
     // 'empty' shows no alert (a blank field is not yet a mistake); covered by
     // the dedicated "disabled while the range field is empty" test above.
-    { kind: 'invalid-token', input: 'abc', expectedFragment: '올바른 범위 형식이 아닙니다' },
-    { kind: 'reversed-range', input: '2-1', expectedFragment: '앞섭니다' },
-    { kind: 'out-of-range', input: '3', expectedFragment: '문서 범위를 벗어났습니다' },
+    { kind: 'invalid-token', input: 'abc', expectedFragment: 'is not a valid range' },
+    { kind: 'reversed-range', input: '2-1', expectedFragment: 'ends before it begins' },
+    { kind: 'out-of-range', input: '3', expectedFragment: 'is outside the document' },
   ]
 
   it.each(INVALID_RANGE_CASES)(

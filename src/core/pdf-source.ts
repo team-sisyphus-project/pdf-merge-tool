@@ -1,5 +1,6 @@
 import { PDFDocument } from 'pdf-lib'
 import type { LoadResult, SourceFile } from './types'
+import { strings } from '../strings'
 
 /**
  * Reads a PDF and produces a {@link SourceFile}, or a classified error.
@@ -11,9 +12,9 @@ import type { LoadResult, SourceFile } from './types'
  * (design spec §6) while keeping existing workspace state intact.
  */
 
-/** User-facing Korean messages (design spec §6). */
-const ENCRYPTED_MESSAGE = '암호로 보호된 PDF입니다. 암호 해제 후 다시 시도해 주세요.'
-const CORRUPT_MESSAGE = '파일이 손상되었거나 올바른 PDF 형식이 아닙니다.'
+// User-facing messages come from the central strings module (design spec §6).
+const ENCRYPTED_MESSAGE = strings.errors.pdfSource.encrypted
+const CORRUPT_MESSAGE = strings.errors.pdfSource.corrupt
 
 /** Fallback name when loading raw bytes without an originating `File`. */
 const DEFAULT_NAME = 'document.pdf'

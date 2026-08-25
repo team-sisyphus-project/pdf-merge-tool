@@ -14,6 +14,8 @@
  * the `notices` channel so the UI may optionally hint that pages were merged.
  */
 
+import { strings } from '../strings'
+
 /**
  * Why a range string could not be parsed. Each kind maps to exactly one class
  * of user mistake so the UI can react distinctly (design spec §6):
@@ -37,7 +39,7 @@ export type RangeNoticeKind = 'duplicate'
 
 export interface RangeError {
   kind: RangeErrorKind
-  /** Human-facing Korean message suitable for inline display (design spec §6). */
+  /** Human-facing message suitable for inline display (design spec §6). */
   message: string
 }
 
@@ -53,29 +55,10 @@ export type ParseRangeResult =
   | { ok: true; indices: number[]; notices: RangeNoticeKind[] }
   | { ok: false; error: RangeError }
 
-// --- Korean inline messages (design spec §6) -------------------------------
-// Tone mirrors `LoadError` in pdf-source.ts: declarative statement of the
-// problem, then a polite "~해 주세요" call to action where one applies.
-
-const EMPTY_MESSAGE = '범위를 입력해 주세요. 예: 1-3, 7, 10-12'
-
-function invalidTokenMessage(token: string): string {
-  return (
-    `'${token}'은(는) 올바른 범위 형식이 아닙니다. ` +
-    `1부터 시작하는 숫자와 범위(예: 1-3, 7)로 입력해 주세요.`
-  )
-}
-
-function reversedRangeMessage(start: number, end: number): string {
-  return (
-    `범위 ${start}-${end}의 끝 페이지가 시작 페이지보다 앞섭니다. ` +
-    `시작이 끝보다 작거나 같도록 입력해 주세요.`
-  )
-}
-
-function outOfRangeMessage(page: number, pageCount: number): string {
-  return `${page}페이지는 문서 범위를 벗어났습니다. 이 문서는 ${pageCount}페이지까지 있습니다.`
-}
+// --- Inline messages (design spec §6) --------------------------------------
+// User-facing copy is sourced from the central strings module so all displayed
+// text lives in one place; see `strings.errors.range`.
+const messages = strings.errors.range
 
 // --- Parsing ---------------------------------------------------------------
 
@@ -102,7 +85,7 @@ function fail(kind: RangeErrorKind, message: string): ParseRangeResult {
  */
 export function parseRange(input: string, pageCount: number): ParseRangeResult {
   if (input.trim().length === 0) {
-    return fail('empty', EMPTY_MESSAGE)
+    return fail('empty', messages.empty)
   }
 
   // `seen` tracks 1-based pages to detect (and merge) duplicates; the sorted,
@@ -112,10 +95,10 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
 
   const addPage = (page: number): ParseRangeResult | null => {
     if (page < 1) {
-      return fail('invalid-token', invalidTokenMessage(String(page)))
+      return fail('invalid-token', messages.invalidToken(String(page)))
     }
     if (page > pageCount) {
-      return fail('out-of-range', outOfRangeMessage(page, pageCount))
+      return fail('out-of-range', messages.outOfRange(page, pageCount))
     }
     if (seen.has(page)) duplicated = true
     seen.add(page)
@@ -126,7 +109,7 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
     const token = raw.trim()
     if (token.length === 0) {
       // A stray/empty segment ("1,,3" or a trailing comma "1,") is malformed.
-      return fail('invalid-token', invalidTokenMessage(raw))
+      return fail('invalid-token', messages.invalidToken(raw))
     }
 
     if (SINGLE.test(token)) {
@@ -141,10 +124,10 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
       const start = Number(range[1])
       const end = Number(range[2])
       if (start < 1 || end < 1) {
-        return fail('invalid-token', invalidTokenMessage(token))
+        return fail('invalid-token', messages.invalidToken(token))
       }
       if (start > end) {
-        return fail('reversed-range', reversedRangeMessage(start, end))
+        return fail('reversed-range', messages.reversedRange(start, end))
       }
       for (let page = start; page <= end; page++) {
         const err = addPage(page)
@@ -154,7 +137,7 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
     }
 
     // Non-numeric, decimal, negative, or otherwise malformed (`1-`, `1-2-3`).
-    return fail('invalid-token', invalidTokenMessage(token))
+    return fail('invalid-token', messages.invalidToken(token))
   }
 
   const indices = [...seen].sort((a, b) => a - b).map((page) => page - 1)

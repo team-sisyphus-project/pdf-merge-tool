@@ -15,11 +15,13 @@
  * `merge.ts`'s job (out of scope here).
  */
 
+import { strings } from '../strings'
+
 /** Default base name used when no usable source name is available (merge export). */
-const DEFAULT_BASE = 'merged'
+const DEFAULT_BASE = strings.filenames.mergeFallback
 
 /** Default base name for split parts when no usable source name is available. */
-const DEFAULT_SPLIT_BASE = 'split'
+const DEFAULT_SPLIT_BASE = strings.filenames.splitFallback
 
 /**
  * File-name characters reserved on common platforms — `< > : " | ? *`. Path
@@ -57,8 +59,8 @@ function toSafeBase(rawName: string): string {
  *   `"<fallback>.pdf"` (default `"merged.pdf"`).
  * - **One usable name** → that name with a normalized `.pdf` suffix, e.g.
  *   `"report.pdf"` or `"report"` → `"report.pdf"`.
- * - **Several usable names** → the first name plus a Korean "and N more"
- *   marker, e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-외2개.pdf"`.
+ * - **Several usable names** → the first name plus a "+N more" marker counting
+ *   the additional sources, e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-+2 more.pdf"`.
  *
  * Directory prefixes are dropped and characters unsafe in file names are
  * replaced, so the result is always a bare, safe `.pdf` file name.
@@ -82,7 +84,9 @@ export function buildExportFilename(
   } else if (bases.length === 1) {
     base = bases[0]
   } else {
-    base = `${bases[0]}-외${bases.length - 1}개`
+    // Preserve the original composition, separator, and order: first base, a
+    // hyphen, then the "+N more" marker counting the remaining sources.
+    base = `${bases[0]}-${strings.filenames.mergeMoreMarker(bases.length - 1)}`
   }
 
   return `${base}.pdf`
