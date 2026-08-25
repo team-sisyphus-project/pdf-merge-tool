@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for the toolbar's 선택 페이지 내보내기 (extract) wiring (grain-1).
+ * Smoke tests for the toolbar's Export Selected Pages (extract) wiring (grain-1).
  *
  * These cover the toolbar's *contract*, not its internals: the button is
  * disabled with no selection, enabled with one, and on click hands the checked
@@ -54,7 +54,7 @@ const splitCountButton = () =>
 const splitRangesButton = () =>
   screen.getByRole('button', { name: 'Split by range' }) as HTMLButtonElement
 
-describe('Toolbar — 선택 페이지 내보내기', () => {
+describe('Toolbar — Export Selected Pages', () => {
   it('is disabled when no pages are selected', () => {
     renderToolbar({ selectedPages: [], selectedCount: 0 })
     expect(selectedExportButton().disabled).toBe(true)
@@ -84,7 +84,7 @@ describe('Toolbar — 선택 페이지 내보내기', () => {
   })
 })
 
-describe('Toolbar — N페이지 단위 분할', () => {
+describe('Toolbar — Split by N Pages', () => {
   it('is disabled until a positive page count is entered', () => {
     renderToolbar()
     expect(splitCountButton().disabled).toBe(true)
@@ -119,7 +119,7 @@ describe('Toolbar — N페이지 단위 분할', () => {
   })
 })
 
-describe('Toolbar — 범위 지정 분할', () => {
+describe('Toolbar — Split by Range', () => {
   it('is disabled while the range field is empty', () => {
     renderToolbar()
     expect(splitRangesButton().disabled).toBe(true)
@@ -153,8 +153,8 @@ describe('Toolbar — 범위 지정 분할', () => {
   })
 
   // Each classified parseRange failure must surface *its own* inline message,
-  // disable 범위 분할, and block the export (design spec §6, grain-2 DoneWhen:
-  // "잘못된 범위 각 케이스에서 인라인 메시지가 표시되고 버튼이 비활성화").
+  // disable range split, and block the export (each invalid-range case shows an
+  // inline message and disables the button).
   // pages.length is 2 here, so the fixtures below map to each RangeErrorKind.
   const INVALID_RANGE_CASES: ReadonlyArray<{
     kind: string

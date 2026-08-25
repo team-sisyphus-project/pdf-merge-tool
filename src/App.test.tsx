@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 /**
- * Smoke test for the core workspace flow (design spec §7): 파일 로드 → 페이지
- * 그리드 표시 → 내보내기 버튼 활성화.
+ * Smoke test for the core workspace flow: load file → show page grid → enable
+ * export button.
  *
- * This is the UI-integration (스모크) layer, not a unit test — it renders the
+ * This is the UI-integration (smoke) layer, not a unit test — it renders the
  * whole {@link App} and drives the real load → derive → render wiring end to
  * end, asserting only the observable transition a user sees. The two heavy
  * boundaries are isolated so the test stays fast and deterministic:
@@ -15,7 +15,7 @@
  *
  * Removing either mock (or breaking the load→grid→enable wiring) makes the
  * assertions fail: dummy bytes would be rejected as corrupt, so no pages would
- * appear and 전체 내보내기 would stay disabled.
+ * appear and Export All would stay disabled.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
@@ -75,7 +75,7 @@ function pdfFile(name = 'sample.pdf'): File {
 }
 
 describe('App workspace smoke flow', () => {
-  it('goes 전체 내보내기 disabled → load file → grid shown → button enabled', async () => {
+  it('goes Export All disabled → load file → grid shown → button enabled', async () => {
     vi.stubGlobal('IntersectionObserver', NoopIntersectionObserver)
 
     const { container } = render(<App />)
@@ -87,7 +87,7 @@ describe('App workspace smoke flow', () => {
     expect(exportButton.disabled).toBe(true)
     expect(screen.queryByText(/^\d+ pages$/)).toBeNull()
 
-    // The hidden file input inside the "PDF 불러오기 영역" drop surface.
+    // The hidden file input inside the "PDF loading area" drop surface.
     const input = container.querySelector(
       'input[type="file"][accept="application/pdf"]',
     ) as HTMLInputElement
