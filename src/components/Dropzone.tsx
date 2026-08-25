@@ -5,13 +5,13 @@ import type { RejectedFile } from '../state/useSourceFiles'
 import { strings } from '../strings'
 
 /**
- * PDF loading surface (design spec §4). Accepts files by drag-and-drop or the
+ * PDF loading surface. Accepts files by drag-and-drop or the
  * file picker, stays available after the first load so more files can be added
  * mid-session, lists what is loaded (name + page count), and surfaces rejected
- * files as inline messages (design spec §6).
+ * files as inline messages.
  *
  * Presentational + interaction only — every load judgment is delegated upward
- * to the state layer (grain-1 core), keeping this component free of PDF logic.
+ * to the state layer (core), keeping this component free of PDF logic.
  */
 export interface DropzoneProps {
   sourceFiles: SourceFile[]

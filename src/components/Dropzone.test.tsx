@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for {@link Dropzone}'s load-error surface (grain-1, design spec §6).
+ * Smoke tests for {@link Dropzone}'s load-error surface.
  *
  * Covers the component's contract, not its internals: rejected files render as
  * inline messages while already-loaded files stay visible (existing state is

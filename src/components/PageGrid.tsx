@@ -20,7 +20,7 @@ import PageThumbnailCard from './PageThumbnailCard'
 import { strings } from '../strings'
 
 /**
- * The unified page grid (design spec §4): every page of every loaded file laid
+ * The unified page grid: every page of every loaded file laid
  * out as thumbnail cards in one grid, each tagged with its origin file's colour.
  *
  * The grid owns the cross-cutting concerns a single card cannot see:
@@ -64,7 +64,7 @@ const DEFAULT_TARGET_WIDTH = 240
 /**
  * How far the pointer must travel before a drag starts (px). Keeps a plain
  * click/tap on the card from being swallowed as a drag — leaving room for the
- * per-card controls (rotate/delete/select) later grains add. Implementation
+ * per-card controls (rotate/delete/select). Implementation
  * setting, not a design token.
  */
 const DRAG_ACTIVATION_DISTANCE = 5

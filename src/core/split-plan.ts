@@ -1,12 +1,12 @@
 /**
- * Download planning for split results (design spec S-00011 §2, "결과가 여러
- * 파일이면 zip으로 묶어 다운로드").
+ * Download planning for split results: a multi-file split is bundled into a
+ * single zip download, while a single-file split downloads directly.
  *
  * A split run (`splitEveryNPages` / `splitByRanges`) emits one `Uint8Array` per
  * output file. Whether that becomes a single `.pdf` download or a bundled `.zip`
  * — and how each file is named — is a pure decision with no DOM or PDF work, so
- * it lives here as React-independent logic the App merely executes (design spec
- * §5). Keeping it pure lets the single-vs-zip branching and filename rules be
+ * it lives here as React-independent logic the App merely executes. Keeping it
+ * pure lets the single-vs-zip branching and filename rules be
  * unit tested without a browser.
  *
  * This module decides; it does not perform. Producing the split bytes is
@@ -41,7 +41,7 @@ function deriveSplitBase(sourceFiles: SourceFile[]): string {
 }
 
 /**
- * Decides how a split result should be downloaded (design spec §2).
+ * Decides how a split result should be downloaded.
  *
  * One part → a single `<base>-1.pdf`. Several parts → a `<base>.zip` whose
  * entries are `<base>-<n>.pdf`, zero-padded to sort naturally (via
@@ -87,7 +87,7 @@ export function planSplitDownload(
 
 /**
  * Reconstructs per-comma-group page positions from a validated range string
- * (design spec §2, "범위 지정 분할").
+ * (the "split by page range" flow).
  *
  * `splitByRanges` emits one PDF per comma group, so — unlike `parseRange`, which
  * flattens the whole string into one sorted index list — each comma-separated

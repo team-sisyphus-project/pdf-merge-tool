@@ -5,8 +5,7 @@ import type { LoadResult, SourceFile } from '../core/types'
 /**
  * `loadFiles` is the pure, React-free heart of the state layer. These tests
  * drive it with an injected fake loader so no real PDF bytes are needed and the
- * batch / partial-failure / id-ownership behaviour (design spec §5, §6) is
- * verified in isolation.
+ * batch / partial-failure / id-ownership behaviour is verified in isolation.
  */
 
 /** Minimal `File` stand-in — `loadFiles` only reads `.name` off the input. */

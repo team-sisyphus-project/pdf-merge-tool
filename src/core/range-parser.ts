@@ -1,13 +1,13 @@
 /**
  * Parses 1-based page-range strings into 0-based page indices.
  *
- * React-independent pure logic (design spec S-00011 §5): a string such as
+ * React-independent pure logic: a string such as
  * `"1-3, 7, 10-12"` becomes a sorted, de-duplicated array of 0-based page
  * indices ready for the split/extract layer. Every failure mode a user can
  * type — empty input, reversed range, out-of-range page, malformed/non-numeric
  * token — is reported as a distinct {@link RangeErrorKind} via a discriminated
  * result (same shape as {@link LoadResult} in `types.ts`), never thrown, so the
- * UI can show a single inline message and block export (design spec §6).
+ * UI can show a single inline message and block export.
  *
  * Duplicates are **not** an error: overlapping pages (e.g. `"1-3, 2"`) are
  * sorted and merged. Their presence is still surfaced — non-fatally — through
@@ -18,7 +18,7 @@ import { strings } from '../strings'
 
 /**
  * Why a range string could not be parsed. Each kind maps to exactly one class
- * of user mistake so the UI can react distinctly (design spec §6):
+ * of user mistake so the UI can react distinctly:
  * - `empty`: the input was blank or only whitespace.
  * - `invalid-token`: a token was not a positive integer or `a-b` range
  *   (non-numeric, zero, negative, decimal, or malformed like `1-` / `1-2-3`).
@@ -39,7 +39,7 @@ export type RangeNoticeKind = 'duplicate'
 
 export interface RangeError {
   kind: RangeErrorKind
-  /** Human-facing message suitable for inline display (design spec §6). */
+  /** Human-facing message suitable for inline display. */
   message: string
 }
 
@@ -55,7 +55,7 @@ export type ParseRangeResult =
   | { ok: true; indices: number[]; notices: RangeNoticeKind[] }
   | { ok: false; error: RangeError }
 
-// --- Inline messages (design spec §6) --------------------------------------
+// --- Inline messages --------------------------------------------------------
 // User-facing copy is sourced from the central strings module so all displayed
 // text lives in one place; see `strings.errors.range`.
 const messages = strings.errors.range

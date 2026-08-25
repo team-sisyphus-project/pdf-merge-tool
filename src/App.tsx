@@ -18,10 +18,10 @@ import './styles/App.css'
 /**
  * Workspace screen.
  * Owns the `sourceFiles` state, derives the flat `pages` array from it, and
- * renders the page grid (grain-3) below the dropzone. A single
+ * renders the page grid below the dropzone. A single
  * {@link ThumbnailRenderer} is shared across every card so each source document
- * is parsed once regardless of how many of its pages are on screen. Export lands
- * in a later grain.
+ * is parsed once regardless of how many of its pages are on screen. Export is
+ * wired through the toolbar above the workspace.
  */
 export default function App() {
   const { sourceFiles, rejected, isLoading, addFiles, dismissRejected } =
@@ -33,7 +33,7 @@ export default function App() {
 
   // The SSoT `pages` array (order/rotation/deletion) plus its mutations and the
   // selection set. Drag reordering commits through `reorder`; the per-card
-  // rotate/delete/select controls (grain-3) commit through the rest.
+  // rotate/delete/select controls commit through the rest.
   const { pages, selected, reorder, rotate, delete: deletePages, toggleSelect } =
     useWorkspacePages(sourceFiles)
 
@@ -44,11 +44,11 @@ export default function App() {
     [deletePages],
   )
 
-  // 전체 내보내기 (design spec §2, 병합): assemble the current `pages` (order +
+  // Export All (merge): assemble the current `pages` (order +
   // rotation) into one PDF and hand the bytes to the client-side download. This
   // "how" lives here in the UI-owning layer; the toolbar owns the "when"
   // (button-state, in-progress, inline error). Rejects propagate so the toolbar
-  // can surface the failure. All bytes stay in the browser (design spec §1).
+  // can surface the failure. All bytes stay in the browser.
   const exportAll = useCallback(
     async (pagesToExport: WorkspacePage[], files: SourceFile[]) => {
       const bytes = await mergePages(pagesToExport, files)
@@ -59,25 +59,25 @@ export default function App() {
   )
 
   // The checked pages in workspace order — filtering the ordered SSoT `pages`
-  // by the selection set preserves output order (design spec §4). This is the
-  // exact subset 선택 페이지 내보내기 assembles.
+  // by the selection set preserves output order. This is the
+  // exact subset Export Selected Pages assembles.
   const selectedPages = useMemo(
     () => pages.filter((page) => selected.has(page.id)),
     [pages, selected],
   )
 
-  // 선택 페이지 내보내기 (design spec §2, 추출): assemble only the checked pages
+  // Export Selected Pages (extract): assemble only the checked pages
   // into a single PDF via the pure `extractPages` core, then download. Mirrors
   // `exportAll`'s split of concerns — this "how" lives here, the toolbar owns
   // the "when". The file is named after the source document(s) the selection
-  // draws from, falling back to 선택페이지 when no source name is usable. Rejects
+  // draws from, falling back to a generic name when no source name is usable. Rejects
   // propagate so the toolbar can surface the inline error.
   const exportSelected = useCallback(
     async (pagesToExport: WorkspacePage[], files: SourceFile[]) => {
       const bytes = await extractPages(pagesToExport, files)
       const nameById = new Map(files.map((file) => [file.id, file.name]))
       // Distinct origin file names in first-seen order; blanks are skipped so
-      // buildExportFilename applies the 선택페이지 fallback when none remain.
+      // buildExportFilename applies the selected-pages fallback when none remain.
       const sourceNames: string[] = []
       const seen = new Set<string>()
       for (const page of pagesToExport) {
@@ -94,11 +94,11 @@ export default function App() {
     [],
   )
 
-  // Executes a split result (design spec §2): one part downloads as a plain PDF,
+  // Executes a split result: one part downloads as a plain PDF,
   // several bundle into one zip. The single-vs-zip decision and all naming is the
   // pure `planSplitDownload`; this wiring only performs the plan's I/O — zip the
   // entries when needed and hand the Blob/bytes to the client-side download. All
-  // bytes stay in the browser (design spec §1). Shared by both split flows.
+  // bytes stay in the browser. Shared by both split flows.
   const deliverSplit = useCallback(
     async (parts: Uint8Array[], files: SourceFile[]) => {
       const plan = planSplitDownload(parts, files)
@@ -112,7 +112,7 @@ export default function App() {
     [],
   )
 
-  // N페이지 단위 분할 (design spec §2): chunk the workspace into fixed-size PDFs
+  // Split by N Pages: chunk the workspace into fixed-size PDFs
   // via the pure `splitEveryNPages`, then deliver (single PDF or zip). Rejects
   // propagate so the toolbar surfaces the inline error.
   const exportSplitByCount = useCallback(
@@ -123,7 +123,7 @@ export default function App() {
     [deliverSplit],
   )
 
-  // 범위 지정 분할 (design spec §2): the toolbar hands us the validated raw range
+  // Split by Range: the toolbar hands us the validated raw range
   // string; reconstruct one index group per comma segment (`parseRangeGroups`),
   // split into one PDF per group, then deliver (single PDF or zip). Rejects
   // propagate so the toolbar surfaces the inline error.

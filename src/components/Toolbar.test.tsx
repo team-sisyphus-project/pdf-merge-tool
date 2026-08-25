@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for the toolbar's 선택 페이지 내보내기 (extract) wiring (grain-1).
+ * Smoke tests for the toolbar's Export Selected Pages (extract) wiring.
  *
  * These cover the toolbar's *contract*, not its internals: the button is
  * disabled with no selection, enabled with one, and on click hands the checked
@@ -153,8 +153,8 @@ describe('Toolbar — 범위 지정 분할', () => {
   })
 
   // Each classified parseRange failure must surface *its own* inline message,
-  // disable 범위 분할, and block the export (design spec §6, grain-2 DoneWhen:
-  // "잘못된 범위 각 케이스에서 인라인 메시지가 표시되고 버튼이 비활성화").
+  // disable the range-split action, and block the export (each invalid-range
+  // case shows an inline message and disables the button).
   // pages.length is 2 here, so the fixtures below map to each RangeErrorKind.
   const INVALID_RANGE_CASES: ReadonlyArray<{
     kind: string

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * React-binding tests for {@link useSourceFiles} (grain-1, design spec §5, §6).
+ * React-binding tests for {@link useSourceFiles}.
  *
  * `useSourceFiles.test.ts` already covers the pure `loadFiles` partitioning. The
  * behaviour that only lives in the hook — appending each batch's successes onto

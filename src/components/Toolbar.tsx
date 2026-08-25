@@ -1,22 +1,22 @@
 /**
- * Workspace toolbar. Hosts the export/split actions (design spec §4) and the
- * live selection count.
+ * Workspace toolbar. Hosts the export/split actions and the live selection
+ * count.
  *
- * Actions and the grain that wired each:
- * - `전체 내보내기` (= 병합, design spec §2) — {@link onExportAll}.
- * - `선택 페이지 내보내기` (= 추출, design spec §2) — {@link onExportSelected}.
- * - `N페이지 단위 분할` / `범위 지정 분할` (design spec §2, this grain) — an
+ * Actions:
+ * - Export All (merge) — {@link onExportAll}.
+ * - Export Selected Pages (extract) — {@link onExportSelected}.
+ * - Split by N Pages / Split by Range — an
  *   input + run button each, calling {@link onSplitByCount} / {@link
  *   onSplitByRanges}. The actual split/zip/download is owned by {@link App}; the
  *   toolbar owns only the "when" (input state, validation, busy, inline error).
  *
  * Every action shares one pattern: the run button is enabled only when its
  * inputs are valid and no action is already running, shows an in-progress label
- * while its action runs, and surfaces a calm inline Korean error if the pipeline
- * fails (design spec §6, 인라인 오류 메시지). A single in-flight guard
+ * while its action runs, and surfaces a calm inline error if the pipeline
+ * fails. A single in-flight guard
  * ({@link exporting}) blocks starting a second action mid-run. The range field
  * additionally validates its string with {@link parseRange} and shows the
- * classified inline message *before* running, blocking the run (design spec §6).
+ * classified inline message *before* running, blocking the run.
  */
 import { useState } from 'react'
 import type { SourceFile, WorkspacePage } from '../core/types'
@@ -25,10 +25,10 @@ import { strings } from '../strings'
 
 /**
  * Inline copy shown when a merge/split/download pipeline throws. Kept generic on
- * purpose: the core layers only throw on corrupt workspace state (design spec
- * §5) and `download*` on a DOM failure — neither is a user-actionable detail, so
+ * purpose: the core layers only throw on corrupt workspace state
+ * and `download*` on a DOM failure — neither is a user-actionable detail, so
  * the message stays a calm "try again" rather than leaking internals
- * (security.md §7, error messages must not reveal system internals).
+ * (error messages must not reveal system internals).
  */
 const EXPORT_ERROR_MESSAGE = strings.errors.exportFailed
 
@@ -36,11 +36,11 @@ const EXPORT_ERROR_MESSAGE = strings.errors.exportFailed
 type ActionKind = 'all' | 'selected' | 'count' | 'ranges'
 
 export interface ToolbarProps {
-  /** Ordered SSoT pages to merge on 전체 내보내기 (order/rotation reflected). */
+  /** Ordered SSoT pages to merge on Export All (order/rotation reflected). */
   pages: WorkspacePage[]
   /**
-   * The checked pages in workspace order — the exact subset 선택 페이지 내보내기
-   * extracts. Empty when nothing is checked, which disables that action.
+   * The checked pages in workspace order — the exact subset Export Selected
+   * Pages extracts. Empty when nothing is checked, which disables that action.
    */
   selectedPages: WorkspacePage[]
   /** Source files the pages reference; their names drive the export filename. */
@@ -106,12 +106,12 @@ export default function Toolbar({
   const hasSelection = selectedPages.length > 0
   const isBusy = exporting !== null
 
-  // ── N페이지 단위 분할: a positive integer chunk size. ──────────────────────
+  // ── Split by N Pages: a positive integer chunk size. ──────────────────────
   const countText = countInput.trim()
   const countValue = Number(countText)
   const countValid = POSITIVE_INT.test(countText) && countValue >= 1
 
-  // ── 범위 지정 분할: validate the string up front (design spec §6). Skip while
+  // ── Split by Range: validate the string up front. Skip while
   // empty or before any pages load — an out-of-range message against a 0-page
   // document would just be noise. The classified message shows inline and blocks
   // the run; a clean parse enables it.
@@ -129,7 +129,7 @@ export default function Toolbar({
   const canSplitRanges =
     hasPages && rangeParse?.ok === true && !isBusy && !!onSplitByRanges
 
-  // Shared run wrapper for every action (design spec §6 inline-error pattern):
+  // Shared run wrapper for every action (inline-error pattern):
   // clear the prior error, mark this action busy, run it, and on failure show
   // the calm inline copy — the detail is not user-actionable.
   const runAction = async (
