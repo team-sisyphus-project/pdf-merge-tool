@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import Toolbar from './Toolbar'
 import type { SourceFile, WorkspacePage } from '../core/types'
+import { HELP_TEXT } from '../strings/helpText'
 
 afterEach(cleanup)
 
@@ -196,6 +197,51 @@ describe('Toolbar — 범위 지정 분할', () => {
     expect(screen.queryByRole('alert')).toBeNull()
     expect(splitRangesButton().disabled).toBe(false)
     expect(rangeField().getAttribute('aria-invalid')).toBeNull()
+  })
+})
+
+describe('Toolbar — 정보 아이콘(InfoTooltip) 배치', () => {
+  // Each toolbar feature carries a per-feature ⓘ whose accessible name is the
+  // grain-1 default `도움말: {title}`. Activation must reveal that key's HELP_TEXT
+  // body (grain-2 DoneWhen: exportAll/splitByCount/splitByRange render + open).
+  const TOOLBAR_HELP_KEYS = ['exportAll', 'splitByCount', 'splitByRange'] as const
+
+  const infoTrigger = (key: (typeof TOOLBAR_HELP_KEYS)[number]) =>
+    screen.getByRole('button', {
+      name: `도움말: ${HELP_TEXT[key].title}`,
+    }) as HTMLButtonElement
+
+  it('renders exactly the three toolbar info icons', () => {
+    renderToolbar()
+    for (const key of TOOLBAR_HELP_KEYS) {
+      expect(infoTrigger(key)).toBeTruthy()
+    }
+  })
+
+  it.each(TOOLBAR_HELP_KEYS)(
+    'reveals the %s help copy only after its icon is activated',
+    (key) => {
+      renderToolbar()
+      const { body } = HELP_TEXT[key]
+
+      // Closed by default — no help body on screen.
+      expect(screen.queryByText(body)).toBeNull()
+
+      fireEvent.click(infoTrigger(key))
+
+      expect(screen.getByText(body)).toBeTruthy()
+      expect(infoTrigger(key).getAttribute('aria-expanded')).toBe('true')
+    },
+  )
+
+  it('opens each toolbar tooltip independently of the others', () => {
+    renderToolbar()
+
+    // Opening one does not open the siblings.
+    fireEvent.click(infoTrigger('splitByCount'))
+    expect(screen.getByText(HELP_TEXT.splitByCount.body)).toBeTruthy()
+    expect(screen.queryByText(HELP_TEXT.exportAll.body)).toBeNull()
+    expect(screen.queryByText(HELP_TEXT.splitByRange.body)).toBeNull()
   })
 })
 
