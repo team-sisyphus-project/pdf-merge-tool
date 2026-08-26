@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createSourceId, loadFiles } from './useSourceFiles'
 import type { LoadResult, SourceFile } from '../core/types'
+import { strings } from '../strings'
 
 /**
  * `loadFiles` is the pure, React-free heart of the state layer. These tests
  * drive it with an injected fake loader so no real PDF bytes are needed and the
- * batch / partial-failure / id-ownership behaviour (design spec §5, §6) is
- * verified in isolation.
+ * batch / partial-failure / id-ownership behaviour is verified in isolation.
  */
 
 /** Minimal `File` stand-in — `loadFiles` only reads `.name` off the input. */
@@ -47,17 +47,14 @@ function ok(name: string, pageCount: number): LoadResult {
 function corrupt(): LoadResult {
   return {
     ok: false,
-    error: { kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
+    error: { kind: 'corrupt', message: strings.errors.pdfSource.corrupt },
   }
 }
 
 function encrypted(): LoadResult {
   return {
     ok: false,
-    error: {
-      kind: 'encrypted',
-      message: 'This PDF is password-protected. Remove the password and try again.',
-    },
+    error: { kind: 'encrypted', message: strings.errors.pdfSource.encrypted },
   }
 }
 
@@ -113,9 +110,13 @@ describe('loadFiles', () => {
       {
         name: 'locked.pdf',
         kind: 'encrypted',
-        message: 'This PDF is password-protected. Remove the password and try again.',
+        message: strings.errors.pdfSource.encrypted,
       },
-      { name: 'broken.pdf', kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
+      {
+        name: 'broken.pdf',
+        kind: 'corrupt',
+        message: strings.errors.pdfSource.corrupt,
+      },
     ])
   })
 

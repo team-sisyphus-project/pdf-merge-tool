@@ -13,15 +13,42 @@
  *
  * This module emits and packages bytes only; producing the merged PDF bytes is
  * `merge.ts`'s job (out of scope here).
+ *
+ * ## Download filename convention (user-observable)
+ *
+ * These are the exact names a user sees in their downloads folder. Template
+ * forkers can change any of them from one place — the `filenames` group in
+ * `strings` — without touching the logic here. The separators (`-`), the "first
+ * base then marker" order, and the split zero-padding are part of the contract
+ * and are preserved; only the wording is configurable.
+ *
+ * - **Merge / export all** ({@link buildExportFilename}):
+ *   - one usable source → that name normalized to `.pdf` (e.g. `report.pdf`);
+ *   - several usable sources → first base + `+N more` marker, where `N` counts
+ *     the sources after the first, e.g. `["a.pdf","b.pdf","c.pdf"]` →
+ *     `a-+2 more.pdf`;
+ *   - no usable source → `merged.pdf` (the `merge` fallback).
+ * - **Export selected pages** ({@link buildExportFilename} with a caller-supplied
+ *   `fallback`): same rule as merge, but when no source name is usable the
+ *   fallback is `selected-pages.pdf` (see `strings.filenames.selectedPagesFallback`).
+ * - **Split (by N pages / by range)** ({@link buildSplitFilenames}): each part is
+ *   `<base>-<n>.pdf`, `n` 1-based and zero-padded to the part count's width
+ *   (e.g. `report-01.pdf` … `report-12.pdf`); when the base is unusable the
+ *   `split` fallback yields `split-1.pdf`, `split-2.pdf`, …
+ *
+ * The marker/fallback wording is English (`+N more` for the merge marker,
+ * `selected-pages` for the extract fallback); when this tool became a reusable
+ * template only that wording changed — separators and order were kept, so the
+ * change is copy-only.
  */
 
 import { strings } from '../strings'
 
 /** Default base name used when no usable source name is available (merge export). */
-const DEFAULT_BASE = 'merged'
+const DEFAULT_BASE = strings.filenames.mergeFallback
 
 /** Default base name for split parts when no usable source name is available. */
-const DEFAULT_SPLIT_BASE = 'split'
+const DEFAULT_SPLIT_BASE = strings.filenames.splitFallback
 
 /**
  * File-name characters reserved on common platforms — `< > : " | ? *`. Path
@@ -49,8 +76,7 @@ function toSafeBase(rawName: string): string {
 }
 
 /**
- * Builds a deterministic file name for the merged export (the "Export All"
- * action, which merges every loaded source into a single PDF).
+ * Builds a deterministic file name for the merged export (export all / merge).
  *
  * The name is derived purely from the ordered source file names, so the same
  * inputs always yield the same output:
@@ -59,8 +85,8 @@ function toSafeBase(rawName: string): string {
  *   `"<fallback>.pdf"` (default `"merged.pdf"`).
  * - **One usable name** → that name with a normalized `.pdf` suffix, e.g.
  *   `"report.pdf"` or `"report"` → `"report.pdf"`.
- * - **Several usable names** → the first name plus an "and N more" marker,
- *   e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-and-2-more.pdf"`.
+ * - **Several usable names** → the first name plus a "+N more" marker counting
+ *   the additional sources, e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-+2 more.pdf"`.
  *
  * Directory prefixes are dropped and characters unsafe in file names are
  * replaced, so the result is always a bare, safe `.pdf` file name.
@@ -84,7 +110,9 @@ export function buildExportFilename(
   } else if (bases.length === 1) {
     base = bases[0]
   } else {
-    base = `${bases[0]}-${strings.filename.moreSources(bases.length - 1)}`
+    // Preserve the original composition, separator, and order: first base, a
+    // hyphen, then the "+N more" marker counting the remaining sources.
+    base = `${bases[0]}-${strings.filenames.mergeMoreMarker(bases.length - 1)}`
   }
 
   return `${base}.pdf`
@@ -92,8 +120,7 @@ export function buildExportFilename(
 
 /**
  * Builds deterministic, ordered file names for a multi-part split result
- * (splitting by page count or by range; when it yields several parts they are
- * delivered together as a zip archive).
+ * (split by N pages / by range → multiple files bundled as a zip).
  *
  * Each part is named `"<base>-<n>.pdf"` where `n` is its 1-based position. The
  * numeric suffix is zero-padded to the width of `count`, so parts sort

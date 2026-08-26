@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for the toolbar's Export Selected Pages (extract) wiring (grain-1).
+ * Smoke tests for the toolbar's Export Selected Pages (extract) wiring.
  *
  * These cover the toolbar's *contract*, not its internals: the button is
  * disabled with no selection, enabled with one, and on click hands the checked
@@ -85,7 +85,7 @@ describe('Toolbar — Export Selected Pages', () => {
   })
 })
 
-describe('Toolbar — Split by N Pages', () => {
+describe('Toolbar — Split by N pages', () => {
   it('is disabled until a positive page count is entered', () => {
     renderToolbar()
     expect(splitCountButton().disabled).toBe(true)
@@ -120,7 +120,7 @@ describe('Toolbar — Split by N Pages', () => {
   })
 })
 
-describe('Toolbar — Split by Range', () => {
+describe('Toolbar — Split by range', () => {
   it('is disabled while the range field is empty', () => {
     renderToolbar()
     expect(splitRangesButton().disabled).toBe(true)
@@ -154,8 +154,8 @@ describe('Toolbar — Split by Range', () => {
   })
 
   // Each classified parseRange failure must surface *its own* inline message,
-  // disable range split, and block the export (each invalid-range case shows an
-  // inline message and disables the button).
+  // disable the range-split action, and block the export (each invalid-range
+  // case shows an inline message and disables the button).
   // pages.length is 2 here, so the fixtures below map to each RangeErrorKind.
   const INVALID_RANGE_CASES: ReadonlyArray<{
     kind: string
@@ -164,8 +164,8 @@ describe('Toolbar — Split by Range', () => {
   }> = [
     // 'empty' shows no alert (a blank field is not yet a mistake); covered by
     // the dedicated "disabled while the range field is empty" test above.
-    { kind: 'invalid-token', input: 'abc', expectedFragment: 'is not a valid page range' },
-    { kind: 'reversed-range', input: '2-1', expectedFragment: 'ends before it starts' },
+    { kind: 'invalid-token', input: 'abc', expectedFragment: 'is not a valid range' },
+    { kind: 'reversed-range', input: '2-1', expectedFragment: 'ends before it begins' },
     { kind: 'out-of-range', input: '3', expectedFragment: 'is outside the document' },
   ]
 

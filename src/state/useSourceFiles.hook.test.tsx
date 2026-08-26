@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * React-binding tests for {@link useSourceFiles} (grain-1, design spec §5, §6).
+ * React-binding tests for {@link useSourceFiles}.
  *
  * `useSourceFiles.test.ts` already covers the pure `loadFiles` partitioning. The
  * behaviour that only lives in the hook — appending each batch's successes onto
@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { useSourceFiles } from './useSourceFiles'
 import type { LoadResult, SourceFile } from '../core/types'
+import { strings } from '../strings'
 
 afterEach(cleanup)
 
@@ -47,14 +48,11 @@ function ok(name: string, pageCount: number): LoadResult {
 
 const encrypted: LoadResult = {
   ok: false,
-  error: {
-    kind: 'encrypted',
-    message: 'This PDF is password-protected. Remove the password and try again.',
-  },
+  error: { kind: 'encrypted', message: strings.errors.pdfSource.encrypted },
 }
 const corrupt: LoadResult = {
   ok: false,
-  error: { kind: 'corrupt', message: 'This file is damaged or is not a valid PDF.' },
+  error: { kind: 'corrupt', message: strings.errors.pdfSource.corrupt },
 }
 
 function idSeq(): () => string {

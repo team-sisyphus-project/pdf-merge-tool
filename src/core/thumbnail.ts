@@ -1,11 +1,11 @@
 /**
- * pdf.js-backed thumbnail rasteriser powering the lazy-rendered page previews.
+ * pdf.js-backed thumbnail rasteriser (lazy thumbnail rendering).
  *
- * This is the isolation boundary for pdf.js: everything that actually touches
- * pdf.js or the DOM canvas lives here; the numeric/keying logic
- * ({@link ./thumbnail-scale}) and the load-cache contract
- * ({@link ./document-cache}) are pure, pdf.js-free, and unit tested on their
- * own. Page rasterisation is delegated to the pdf.js **worker** — merely
+ * This is the isolation boundary for pdf.js. Everything that actually touches
+ * pdf.js or the DOM canvas lives
+ * here; the numeric/keying logic ({@link ./thumbnail-scale}) and the load-cache
+ * contract ({@link ./document-cache}) are pure, pdf.js-free, and unit tested on
+ * their own. Page rasterisation is delegated to the pdf.js **worker** — merely
  * setting `GlobalWorkerOptions.workerSrc` makes pdf.js parse and paint off the
  * main thread, which is what keeps the UI responsive on large files.
  *
@@ -166,7 +166,7 @@ export class ThumbnailRenderer {
  *
  * A *copy* of the bytes is handed to pdf.js: `getDocument` may transfer the
  * backing `ArrayBuffer` to the worker and detach it, which would corrupt the
- * original `SourceFile.bytes` that merge/split rely on (the SSoT bytes).
+ * original `SourceFile.bytes` that merge/split rely on (kept as the SSoT).
  */
 function loadDocument(bytes: ArrayBuffer): Promise<PDFDocumentProxy> {
   const copy = bytes.slice(0)

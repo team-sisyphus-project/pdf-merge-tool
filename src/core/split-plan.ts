@@ -1,13 +1,13 @@
 /**
- * Download planning for split results: bundle several output files into one
- * zip, or download a lone file directly.
+ * Download planning for split results: a multi-file split is bundled into a
+ * single zip download, while a single-file split downloads directly.
  *
  * A split run (`splitEveryNPages` / `splitByRanges`) emits one `Uint8Array` per
  * output file. Whether that becomes a single `.pdf` download or a bundled `.zip`
  * — and how each file is named — is a pure decision with no DOM or PDF work, so
  * it lives here as React-independent logic the App merely executes. Keeping it
- * pure lets the single-vs-zip branching and filename rules be unit tested
- * without a browser.
+ * pure lets the single-vs-zip branching and filename rules be
+ * unit tested without a browser.
  *
  * This module decides; it does not perform. Producing the split bytes is
  * `split.ts`, building the zip `Blob` is `zip.ts`, and triggering the browser
@@ -87,7 +87,7 @@ export function planSplitDownload(
 
 /**
  * Reconstructs per-comma-group page positions from a validated range string
- * for the range-split feature.
+ * (the "split by page range" flow).
  *
  * `splitByRanges` emits one PDF per comma group, so — unlike `parseRange`, which
  * flattens the whole string into one sorted index list — each comma-separated

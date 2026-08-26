@@ -6,13 +6,13 @@ import { strings } from '../strings'
 import InfoTooltip from './InfoTooltip'
 
 /**
- * PDF loading surface (design spec §4). Accepts files by drag-and-drop or the
+ * PDF loading surface. Accepts files by drag-and-drop or the
  * file picker, stays available after the first load so more files can be added
  * mid-session, lists what is loaded (name + page count), and surfaces rejected
- * files as inline messages (design spec §6).
+ * files as inline messages.
  *
  * Presentational + interaction only — every load judgment is delegated upward
- * to the state layer (grain-1 core), keeping this component free of PDF logic.
+ * to the state layer (core), keeping this component free of PDF logic.
  */
 export interface DropzoneProps {
   sourceFiles: SourceFile[]
@@ -21,8 +21,6 @@ export interface DropzoneProps {
   onAddFiles: (files: File[]) => void
   onDismissRejected: () => void
 }
-
-const PAGE_LABEL = (count: number) => strings.dropzone.pageCount(count)
 
 export default function Dropzone({
   sourceFiles,
@@ -91,7 +89,7 @@ export default function Dropzone({
     <>
       <section
         className={dropClasses}
-        aria-label={strings.dropzone.ariaLabel}
+        aria-label={strings.dropzone.regionLabel}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -105,7 +103,7 @@ export default function Dropzone({
           </svg>
         </div>
         <h2 className="dropzone__title">
-          {hasFiles ? strings.dropzone.titleMore : strings.dropzone.titleEmpty}
+          {hasFiles ? strings.dropzone.dropMoreTitle : strings.dropzone.dropTitle}
         </h2>
         <p className="dropzone__desc">{strings.dropzone.description}</p>
         <button
@@ -131,7 +129,7 @@ export default function Dropzone({
           tabIndex={-1}
         />
         <p className="dropzone__note">
-          {strings.dropzone.note}
+          {strings.dropzone.privacyNote}
           {/* Feature help for the whole load surface (spec §Dropzone): drag-or-
               pick, multi-file append order, local-only processing. Last sibling
               of the notice so it reads as a trailing "more info" affordance. */}
@@ -143,7 +141,7 @@ export default function Dropzone({
         <div className="load-errors" role="alert">
           <div className="load-errors__head">
             <span className="load-errors__title">
-              {strings.dropzone.loadErrorsTitle(rejected.length)}
+              {strings.dropzone.rejectedTitle(rejected.length)}
             </span>
             <button
               type="button"
@@ -165,7 +163,7 @@ export default function Dropzone({
       )}
 
       {hasFiles && (
-        <section className="source-list" aria-label={strings.dropzone.sourceListAria}>
+        <section className="source-list" aria-label={strings.dropzone.sourceListLabel}>
           <h3 className="source-list__title">
             {strings.dropzone.sourceListTitle(sourceFiles.length)}
           </h3>
@@ -180,7 +178,7 @@ export default function Dropzone({
                 </span>
                 <span className="source-list__name">{file.name}</span>
                 <span className="source-list__pages">
-                  {PAGE_LABEL(file.pageCount)}
+                  {strings.dropzone.pageCount(file.pageCount)}
                 </span>
               </li>
             ))}

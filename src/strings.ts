@@ -1,137 +1,216 @@
 /**
- * Central catalogue of user-facing UI copy for the presentation layer.
+ * Central source of truth for every user-facing string in the app.
  *
- * Every label, placeholder, hint, status line, and accessibility label
- * (`aria-label` / `alt`) rendered by the app's components is defined here, in
- * one place, so a developer forking this template has a single English source
- * to translate from. Values are fixed to English on purpose: this module leaves
- * room for a future locale layer but does not itself build a runtime language
- * system (only the copy is centralised, not a switching mechanism).
+ * Historically these labels, hints, error messages, placeholders, accessibility
+ * descriptions, generated file-name markers, and console messages were
+ * hardcoded (in Korean) across the components and core modules. Collecting them
+ * here makes the copy auditable in one place and gives a fork of this template a
+ * single English starting point regardless of the developer's own locale.
  *
- * Parameterised entries are small functions so call sites read naturally and
- * pluralisation/interpolation stays out of the components.
+ * i18n note: values are hardcoded English on purpose — no runtime language
+ * toggle and no i18n framework are introduced here. The *shape* is deliberately
+ * locale-agnostic: static text is a plain string and anything parameterized is a
+ * pure builder function, grouped by concern. To add a language later, wrap this
+ * object per locale (e.g. `byLocale[locale] = strings`) without touching any
+ * call site.
+ *
+ * Boundary: this is a standalone constants module. It imports nothing from the
+ * components or core layers, so those layers depend on it and never the reverse.
  */
 
-/** Pluralises the English word "page" for a page count. */
-const pageWord = (count: number): string => (count === 1 ? 'page' : 'pages')
+/** App shell header (AppHeader). */
+const header = {
+  /** Product title shown in the header. */
+  title: 'PDF Workspace',
+  /** Subtitle emphasizing the privacy model: nothing leaves the browser. */
+  subtitle: 'Processed right in your browser · files are never sent to a server',
+} as const
 
-/** Pluralises the English word "file" for a file count. */
-const fileWord = (count: number): string => (count === 1 ? 'file' : 'files')
+/** Workspace toolbar: export/split actions, inputs, hints (Toolbar). */
+const toolbar = {
+  /** Landmark label for the toolbar region. */
+  regionLabel: 'Document tools',
 
-export const strings = {
-  /** App shell header (brand title + privacy subtitle). */
-  header: {
-    title: 'PDF Workspace',
-    subtitle: 'Processed right in your browser · files are never sent to a server',
-  },
+  /** Merge-and-download action (Export All). */
+  exportAll: 'Export All',
+  /** Extract-selected-pages action (Export Selected Pages). */
+  exportSelected: 'Export Selected Pages',
+  /** In-progress label for both export actions. */
+  exporting: 'Exporting…',
 
-  /** Workspace toolbar: export/split actions, inputs, hints, and errors. */
-  toolbar: {
-    ariaLabel: 'Document actions',
-    exportAll: 'Export All',
-    exportSelected: 'Export Selected Pages',
-    exporting: 'Exporting…',
-    splitByCount: 'Split by N Pages',
-    /** Stable accessible name for the count-split button (survives busy swap). */
-    splitByCountAria: 'Split by N pages',
-    splitByRange: 'Split by Range',
-    /** Stable accessible name for the range-split button (survives busy swap). */
-    splitByRangeAria: 'Split by range',
-    splitting: 'Splitting…',
-    countPlaceholder: 'e.g. 2',
-    countAria: 'Pages per split',
-    rangePlaceholder: 'e.g. 1-3, 7, 10-12',
-    rangeAria: 'Split range',
-    /** Calm inline copy shown when an export/split pipeline fails. */
-    exportError: 'Could not create the PDF. Please try again in a moment.',
-    selection: (count: number): string => `Selected ${count}`,
-    hintReady: 'Export or split to save your PDF.',
-    hintEmpty: 'Load a PDF to enable these tools.',
-  },
+  /** Split-every-N-pages run button. */
+  splitByCount: 'Split by N Pages',
+  /** Split-by-range run button. */
+  splitByRange: 'Split by Range',
+  /** In-progress label for both split actions. */
+  splitting: 'Splitting…',
 
-  /** PDF loading surface: drop area, picker button, and the loaded-file list. */
-  dropzone: {
-    ariaLabel: 'PDF loading area',
-    titleMore: 'Drop more PDFs here',
-    titleEmpty: 'Drop your PDFs here',
-    description:
-      'Or choose files with the button below. You can load several at once.',
-    loading: 'Loading…',
-    addFiles: 'Add files',
-    chooseFiles: 'Choose files',
-    note: 'All processing happens entirely in your browser.',
-    loadErrorsTitle: (count: number): string =>
-      `${count} ${fileWord(count)} could not be loaded`,
-    dismiss: 'Dismiss',
-    sourceListAria: 'Loaded files',
-    sourceListTitle: (count: number): string =>
-      `${count} ${fileWord(count)} loaded`,
-    pageCount: (count: number): string => `${count} ${pageWord(count)}`,
-  },
+  /** Placeholder example for the "pages per split" number field. */
+  countPlaceholder: 'e.g. 2',
+  /** Accessible name for the "pages per split" number field. */
+  countFieldLabel: 'Pages per split',
+  /** Accessible name for the split-by-count run button. */
+  splitByCountAction: 'Split by N pages',
 
-  /** A single page thumbnail card: preview alt + accessibility labels. */
-  pageCard: {
-    previewAlt: (source: string, page: number): string =>
-      `${source} page ${page} preview`,
-    previewError: 'Preview failed to load',
-    previewLoading: 'Preparing preview',
-    selectPage: (source: string, page: number): string =>
-      `Select ${source} page ${page}`,
-    rotatePage: (source: string, page: number): string =>
-      `Rotate ${source} page ${page} 90 degrees`,
-    deletePage: (source: string, page: number): string =>
-      `Delete ${source} page ${page}`,
-  },
+  /** Placeholder example for the range field (syntax itself is unchanged). */
+  rangePlaceholder: 'e.g. 1-3, 7, 10-12',
+  /** Accessible name for the range field. */
+  rangeFieldLabel: 'Split range',
+  /** Accessible name for the split-by-range run button. */
+  splitByRangeAction: 'Split by range',
 
-  /** The unified page grid: region label + page-count heading. */
-  pageGrid: {
-    ariaLabel: 'Page preview',
-    title: (count: number): string => `${count} ${pageWord(count)}`,
-  },
+  /** Live count of currently checked pages. */
+  selectionCount: (count: number): string => `${count} selected`,
+  /** Hint shown once pages are loaded. */
+  hintReady: 'Export or split to save your PDF.',
+  /** Hint shown before any PDF is loaded. */
+  hintEmpty: 'Load a PDF to enable the tools.',
+} as const
 
-  /**
-   * Core range-parser inline errors. Each string maps to one distinct parse
-   * failure; tone stays calm and recoverable (states the problem, then how to
-   * fix it) to match the rest of the app's error copy.
-   */
-  rangeError: {
-    empty: 'Enter a page range. For example: 1-3, 7, 10-12',
+/** PDF loading surface (Dropzone). */
+const dropzone = {
+  /** Landmark label for the drop area. */
+  regionLabel: 'PDF loading area',
+
+  /** Drop-area title once files are already loaded. */
+  dropMoreTitle: 'Drop more PDFs here',
+  /** Drop-area title before any file is loaded. */
+  dropTitle: 'Drop your PDFs here',
+  /** Instruction under the title. */
+  description: 'Or use the button below to choose files. You can load several at once.',
+
+  /** File-picker button while a load is in progress. */
+  loading: 'Loading…',
+  /** File-picker button once files are already loaded. */
+  addFiles: 'Add files',
+  /** File-picker button before any file is loaded. */
+  chooseFiles: 'Choose files',
+  /** Privacy reassurance under the picker. */
+  privacyNote: 'All processing happens entirely in your browser.',
+
+  /** Heading for the list of files that failed to load. */
+  rejectedTitle: (count: number): string => `${count} files couldn't be loaded`,
+  /** Dismiss button for the rejected-files panel. */
+  dismiss: 'Dismiss',
+
+  /** Landmark label for the loaded-files list. */
+  sourceListLabel: 'Loaded files',
+  /** Heading for the loaded-files list. */
+  sourceListTitle: (count: number): string => `${count} files loaded`,
+  /** Per-file page-count badge. */
+  pageCount: (count: number): string => `${count} pages`,
+} as const
+
+/** The unified page grid (PageGrid). */
+const pageGrid = {
+  /** Landmark label for the page grid section. */
+  regionLabel: 'Page preview',
+  /** Heading with the total page count. */
+  title: (count: number): string => `${count} pages`,
+} as const
+
+/**
+ * Per-page thumbnail card accessibility copy (PageThumbnailCard).
+ *
+ * These are aria-label/alt builders: the wording changes but the *meaning* a
+ * screen reader conveys (which page, of which file, and the control's role) is
+ * preserved exactly.
+ */
+const pageCard = {
+  /** Alt text for the rendered thumbnail image. */
+  previewAlt: (sourceName: string, pageLabel: number): string =>
+    `${sourceName} page ${pageLabel} preview`,
+  /** Status label when a thumbnail fails to render. */
+  previewFailed: 'Preview failed to load',
+  /** Status label while a thumbnail is being prepared. */
+  previewLoading: 'Preparing preview',
+  /** Accessible name for the selection checkbox. */
+  selectPage: (sourceName: string, pageLabel: number): string =>
+    `Select ${sourceName} page ${pageLabel}`,
+  /** Accessible name for the rotate-90°-clockwise button. */
+  rotatePage: (sourceName: string, pageLabel: number): string =>
+    `Rotate ${sourceName} page ${pageLabel} 90 degrees`,
+  /** Accessible name for the delete-page button. */
+  deletePage: (sourceName: string, pageLabel: number): string =>
+    `Delete ${sourceName} page ${pageLabel}`,
+} as const
+
+/**
+ * Classified error copy. Each builder mirrors an existing error condition — the
+ * language changes but *what failed and why* is unchanged.
+ */
+const errors = {
+  /** Range-parser inline messages (core/range-parser). */
+  range: {
+    /** Input was blank or whitespace only. */
+    empty: 'Enter a range. e.g. 1-3, 7, 10-12',
+    /** A token was not a positive integer or `a-b` range. */
     invalidToken: (token: string): string =>
-      `'${token}' is not a valid page range. ` +
-      `Use page numbers and ranges starting at 1, for example: 1-3, 7.`,
+      `'${token}' is not a valid range. Use page numbers and ranges starting from 1 (e.g. 1-3, 7).`,
+    /** A range's end page is smaller than its start. */
     reversedRange: (start: number, end: number): string =>
-      `Range ${start}-${end} ends before it starts. ` +
-      `Enter the start on or before the end.`,
+      `The range ${start}-${end} ends before it begins. Make the start less than or equal to the end.`,
+    /** A page exceeds the document's page count. */
     outOfRange: (page: number, pageCount: number): string =>
-      `Page ${page} is outside the document. ` +
-      `This document has ${pageCount} ${pageWord(pageCount)}.`,
+      `Page ${page} is outside the document. This document has ${pageCount} pages.`,
   },
-
-  /** Core PDF-loading errors, one per distinct rejection reason. */
-  loadError: {
-    encrypted:
-      'This PDF is password-protected. Remove the password and try again.',
+  /** PDF load errors (core/pdf-source). */
+  pdfSource: {
+    /** The PDF is password protected. */
+    encrypted: 'This PDF is password protected. Remove the password and try again.',
+    /** The bytes are corrupt or not a valid PDF. */
     corrupt: 'This file is damaged or is not a valid PDF.',
   },
-
   /**
-   * Markers embedded in generated download file names. These are directly
-   * observable by the user in their downloads, so they live in the same copy
-   * catalogue as on-screen text.
+   * Generic inline copy shown when a merge/split/download pipeline fails
+   * (Toolbar). Intentionally non-specific so it never leaks system internals.
    */
-  filename: {
-    /**
-     * Suffix appended after the first source name when a merge export draws
-     * from several files, e.g. three files → `first-and-2-more.pdf`. Hyphen-
-     * joined so the whole file name stays space-free and sorts cleanly.
-     */
-    moreSources: (extra: number): string => `and-${extra}-more`,
-    /** Fallback base name for the "export selected pages" download. */
-    selectedFallback: 'selected-pages',
-  },
-
-  /** Developer-facing diagnostics emitted during app bootstrap. */
-  boot: {
-    rootMissing: 'Root element (#root) was not found.',
-  },
+  exportFailed: "Couldn't create the PDF. Please try again in a moment.",
 } as const
+
+/**
+ * Generated file-name pieces (core/download). These strings are directly
+ * observable by the user in their downloads.
+ *
+ * The existing composition, separator, and order are preserved: the multi-source
+ * merge name stays `"{firstBase}-{marker}"`, so with `mergeMoreMarker` a three-
+ * source export becomes e.g. `report-+2 more.pdf`.
+ */
+const filenames = {
+  /** Fallback base for a merge export when no source name is usable. */
+  mergeFallback: 'merged',
+  /** Fallback base for split parts when no source name is usable. */
+  splitFallback: 'split',
+  /** Fallback base for a selected-pages export when no source name is usable. */
+  selectedPagesFallback: 'selected-pages',
+  /**
+   * Marker appended after the first source base for a multi-source merge.
+   * @param moreCount How many additional sources beyond the first (>= 1).
+   */
+  mergeMoreMarker: (moreCount: number): string => `+${moreCount} more`,
+} as const
+
+/** Developer-facing console messages (main.tsx). Not shown to end users. */
+const consoleMessages = {
+  /** Thrown when the root mount element is missing. */
+  rootElementMissing: 'Root element (#root) was not found.',
+} as const
+
+/**
+ * The full English string set, grouped by concern. Exported as both a named and
+ * default binding so call sites can import whichever reads best.
+ */
+export const strings = {
+  header,
+  toolbar,
+  dropzone,
+  pageGrid,
+  pageCard,
+  errors,
+  filenames,
+  console: consoleMessages,
+} as const
+
+export type Strings = typeof strings
+
+export default strings

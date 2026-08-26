@@ -5,8 +5,8 @@ import { pruneSelection, toggleSelection } from './useWorkspacePages'
  * `useWorkspacePages` keeps its ordering logic in the pure `core/pages`
  * functions (tested in `core/pages.test.ts`) and its selection logic in these
  * two pure helpers. Testing the helpers directly — the same convention as
- * `useSourceFiles` — verifies the selection behaviour (design spec §4 grid
- * check-select) without a DOM.
+ * `useSourceFiles` — verifies the selection (grid check-select) behaviour
+ * without a DOM.
  */
 
 describe('toggleSelection', () => {

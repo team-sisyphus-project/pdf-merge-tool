@@ -2,7 +2,7 @@ import { PDFDocument, degrees } from 'pdf-lib'
 import type { SourceFile, WorkspacePage } from './types'
 
 /**
- * Merge feature: combines every workspace page into one exported PDF.
+ * Merges workspace pages into a single PDF (the "export all" flow).
  *
  * React-independent pure function: given the ordered `pages` array (the SSoT
  * for order/rotation/deletion) and the `sourceFiles` they reference, it

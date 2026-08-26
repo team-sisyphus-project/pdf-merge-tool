@@ -1,5 +1,6 @@
 /**
- * Workspace page model plus the reorder, rotate, and delete features.
+ * Pure `sourceFiles` → `WorkspacePage[]` derivation, plus the page rotate,
+ * delete, and drag-reorder mutations over that array.
  *
  * The page grid lists *every* page of *every* loaded file in one flat grid. This
  * module is the single place that flattens the loaded documents into the ordered

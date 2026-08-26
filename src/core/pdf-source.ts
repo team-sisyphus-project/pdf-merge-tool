@@ -5,16 +5,16 @@ import { strings } from '../strings'
 /**
  * Reads a PDF and produces a {@link SourceFile}, or a classified error.
  *
- * React-independent (design spec S-00011 §5). Accepts either a browser `File`
+ * React-independent. Accepts either a browser `File`
  * (drag-and-drop / file picker) or a raw `ArrayBuffer` (tests, programmatic
  * use). Never throws for bad input — encryption and corruption are reported as
  * distinct {@link LoadResult} errors so the UI can show the right guidance
- * (design spec §6) while keeping existing workspace state intact.
+ * while keeping existing workspace state intact.
  */
 
-/** User-facing English messages (centralised in `src/strings.ts`). */
-const ENCRYPTED_MESSAGE = strings.loadError.encrypted
-const CORRUPT_MESSAGE = strings.loadError.corrupt
+// User-facing messages come from the central strings module.
+const ENCRYPTED_MESSAGE = strings.errors.pdfSource.encrypted
+const CORRUPT_MESSAGE = strings.errors.pdfSource.corrupt
 
 /** Fallback name when loading raw bytes without an originating `File`. */
 const DEFAULT_NAME = 'document.pdf'

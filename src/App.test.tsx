@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
- * Smoke test for the core workspace flow: load file → show page grid → enable
- * export button.
+ * Smoke test for the core workspace flow: load a file → show the page grid →
+ * enable the export button.
  *
  * This is the UI-integration (smoke) layer, not a unit test — it renders the
  * whole {@link App} and drives the real load → derive → render wiring end to
@@ -87,7 +87,7 @@ describe('App workspace smoke flow', () => {
     expect(exportButton.disabled).toBe(true)
     expect(screen.queryByText(/^\d+ pages$/)).toBeNull()
 
-    // The hidden file input inside the "PDF loading area" drop surface.
+    // The hidden file input inside the PDF drop surface.
     const input = container.querySelector(
       'input[type="file"][accept="application/pdf"]',
     ) as HTMLInputElement
@@ -99,9 +99,11 @@ describe('App workspace smoke flow', () => {
     })
 
     // The page grid appears with a heading reflecting the derived page count.
-    // Queried by role so it is not confused with the source list's per-file
-    // "2 pages" count, which shares the same text.
-    expect(await screen.findByRole('heading', { name: '2 pages' })).toBeDefined()
+    // Queried by role so it can't collide with the Dropzone per-file page-count
+    // badge, which shares the same "N pages" wording in a different region.
+    expect(
+      await screen.findByRole('heading', { name: '2 pages' }),
+    ).toBeDefined()
 
     // …and the merge action has transitioned to enabled.
     const exportAfter = screen.getByRole('button', {

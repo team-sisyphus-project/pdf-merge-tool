@@ -8,22 +8,23 @@ import { strings } from '../strings'
 import InfoTooltip from './InfoTooltip'
 
 /**
- * One page rendered as a thumbnail card in the page grid.
+ * One page rendered as a thumbnail card (a single page tile in the grid).
  *
  * Two behaviours live here:
  *
- * - **Thumbnail lazy render.** The heavy pdf.js rasterise is deferred until the
- *   card actually approaches the viewport, observed via `IntersectionObserver`.
- *   A workspace with hundreds of pages therefore only rasterises what the user
- *   can (nearly) see, keeping scroll responsive on large files.
- * - **Source colour tag.** Each card carries the categorical colour assigned to
- *   its origin file so the user can tell at a glance which PDF a page came from.
- *   The colour is a design-token reference ({@link SourceColor.cssVar}) — no raw
- *   hex reaches this component.
+ * - **Lazy render (keeps the UI responsive on large files).** The heavy pdf.js
+ *   rasterise is deferred until the card actually approaches the viewport,
+ *   observed via `IntersectionObserver`. A workspace with hundreds of pages
+ *   therefore only rasterises what the user can (nearly) see, keeping scroll
+ *   responsive.
+ * - **Source colour tag (per-source colour coding).** Each card carries the
+ *   categorical colour assigned to its origin file so the user can tell at a
+ *   glance which PDF a page came from. The colour is a design-token reference
+ *   ({@link SourceColor.cssVar}) — no raw hex reaches this component.
  *
  * Presentational + orchestration only: the actual raster is produced by the
- * injected {@link ThumbnailRenderer}, so the parent can share one document cache
- * across every card.
+ * shared {@link ThumbnailRenderer}, injected so the parent can share one
+ * document cache across every card.
  */
 export interface PageThumbnailCardProps {
   /** SSoT page id — the sortable item id dnd-kit reorders on ({@link WorkspacePage.id}). */
@@ -132,7 +133,7 @@ export default function PageThumbnailCard({
   const [visible, setVisible] = useState(false)
   const [state, setState] = useState<RenderState>({ status: 'idle' })
 
-  // Sortable wiring. `useSortable` supplies the drag handle listeners,
+  // Sortable wiring for drag-reorder. `useSortable` supplies the drag handle listeners,
   // the live transform that slides this card as siblings are reordered, and the
   // `isDragging` flag that drives the lifted drag-state styling. The reorder
   // itself is committed by the grid's `onDragEnd` against the SSoT `pages`
@@ -235,7 +236,7 @@ export default function PageThumbnailCard({
             loading="lazy"
           />
         ) : state.status === 'error' ? (
-          <span className="page-card__status page-card__status--error" role="img" aria-label={strings.pageCard.previewError}>
+          <span className="page-card__status page-card__status--error" role="img" aria-label={strings.pageCard.previewFailed}>
             !
           </span>
         ) : (
