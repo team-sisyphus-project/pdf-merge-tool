@@ -22,6 +22,7 @@ import { useState } from 'react'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import { parseRange } from '../core/range-parser'
 import { strings } from '../strings'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * Inline copy shown when a merge/split/download pipeline throws. Kept generic on
@@ -192,6 +193,8 @@ export default function Toolbar({
             ? strings.toolbar.exporting
             : strings.toolbar.exportSelected}
         </button>
+        {/* Explains the 전체(병합) vs 선택(추출) difference for this action group. */}
+        <InfoTooltip helpKey="exportAll" />
       </div>
 
       <div className="toolbar__group toolbar__group--split">
@@ -218,6 +221,8 @@ export default function Toolbar({
           >
             {exporting === 'count' ? strings.toolbar.splitting : strings.toolbar.splitByCount}
           </button>
+          {/* Explains the N-page chunk-split behaviour. */}
+          <InfoTooltip helpKey="splitByCount" />
         </div>
 
         <div className="split-control">
@@ -243,6 +248,8 @@ export default function Toolbar({
           >
             {exporting === 'ranges' ? strings.toolbar.splitting : strings.toolbar.splitByRange}
           </button>
+          {/* Explains the "1-3, 7, 10-12" range notation and input format. */}
+          <InfoTooltip helpKey="splitByRange" />
         </div>
       </div>
 

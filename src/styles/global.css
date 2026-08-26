@@ -20,6 +20,7 @@
   --color-status-danger: #dc2626;
   --color-status-danger-soft: #fef2f2;
   --color-status-danger-border: #fecaca;
+  --color-overlay-scrim: rgba(15, 23, 42, 0.45);
 
   /* color-categorical — cyclic qualitative palette for per-source page tags.
    * Distinct, roughly equal-weight hues (red reserved for danger, so omitted)

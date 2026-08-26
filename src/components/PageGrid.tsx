@@ -18,6 +18,7 @@ import type { ThumbnailRenderer } from '../core/thumbnail'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import PageThumbnailCard from './PageThumbnailCard'
 import { strings } from '../strings'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * The unified page grid: every page of every loaded file laid
@@ -118,7 +119,13 @@ export default function PageGrid({
 
   return (
     <section className="page-grid-section" aria-label={strings.pageGrid.regionLabel}>
-      <h3 className="page-grid__title">{strings.pageGrid.title(pages.length)}</h3>
+      <h3 className="page-grid__title">
+        {strings.pageGrid.title(pages.length)}
+        {/* Grid-top help for drag reorder (spec §페이지 그리드 상단): dragging a
+            thumbnail sets the final export order. Placed beside the grid title
+            so it explains the grid as a whole, not any one card. */}
+        <InfoTooltip helpKey="reorder" />
+      </h3>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

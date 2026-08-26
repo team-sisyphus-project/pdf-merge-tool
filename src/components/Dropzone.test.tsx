@@ -13,6 +13,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import Dropzone from './Dropzone'
 import type { SourceFile } from '../core/types'
 import type { RejectedFile } from '../state/useSourceFiles'
+import { HELP_TEXT } from '../strings/helpText'
 
 afterEach(cleanup)
 
@@ -80,5 +81,32 @@ describe('Dropzone load errors', () => {
     fireEvent.click(screen.getByText('Dismiss'))
 
     expect(onDismissRejected).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Dropzone — 정보 아이콘(InfoTooltip)', () => {
+  // The load surface carries a per-feature ⓘ (helpKey="dropzone") whose default
+  // accessible name is the grain-1 `도움말: {title}`. Activation reveals that
+  // key's HELP_TEXT body (grain-3 DoneWhen: render + open for dropzone).
+  const dropzoneTrigger = () =>
+    screen.getByRole('button', {
+      name: `도움말: ${HELP_TEXT.dropzone.title}`,
+    }) as HTMLButtonElement
+
+  it('renders the dropzone info icon', () => {
+    renderDropzone()
+    expect(dropzoneTrigger()).toBeTruthy()
+  })
+
+  it('reveals the dropzone help copy only after the icon is activated', () => {
+    renderDropzone()
+    const { body } = HELP_TEXT.dropzone
+
+    expect(screen.queryByText(body)).toBeNull()
+
+    fireEvent.click(dropzoneTrigger())
+
+    expect(screen.getByText(body)).toBeTruthy()
+    expect(dropzoneTrigger().getAttribute('aria-expanded')).toBe('true')
   })
 })

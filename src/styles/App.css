@@ -61,6 +61,13 @@
   color: var(--color-text-secondary);
 }
 
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
 .app-header__job-badge {
   flex-shrink: 0;
   padding: var(--space-xs) var(--space-sm);
@@ -71,6 +78,46 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-full);
   white-space: nowrap;
+}
+
+.app-header__help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base) var(--transition-easing-standard),
+    background-color var(--transition-duration-base) var(--transition-easing-standard),
+    border-color var(--transition-duration-base) var(--transition-easing-standard);
+}
+
+.app-header__help svg {
+  width: 20px;
+  height: 20px;
+}
+
+.app-header__help:hover {
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+.app-header__help:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.app-header__help[aria-expanded='true'] {
+  color: var(--color-accent-primary);
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent-primary);
 }
 
 /* ── Toolbar ────────────────────────────────────────────────── */
@@ -636,6 +683,215 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Info tooltip ───────────────────────────────────────────── */
+/* Per-feature ⓘ help icon + its popover (spec: 기능별 도움말 시스템). All design
+ * values come from tokens; position/z-index and the popover max-width (an element
+ * dimension, like other sized elements here) are direct implementation values. */
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.info-tooltip__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base)
+    var(--transition-easing-standard);
+}
+
+.info-tooltip__trigger:hover,
+.info-tooltip__trigger[aria-expanded='true'] {
+  color: var(--color-accent-primary);
+}
+
+.info-tooltip__trigger:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.info-tooltip__trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.info-tooltip__popover {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: max-content;
+  max-width: 260px;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.info-tooltip__title {
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.info-tooltip__body {
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
+/* ── Help dialog ────────────────────────────────────────────── */
+/* Unified help modal (spec: 기능별 도움말 시스템, 통합 도움말 화면). All design
+ * values come from tokens; the fixed full-viewport positioning, z-index and the
+ * panel's max-width / max-height (element dimensions) are implementation values. */
+.help-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background-color: var(--color-overlay-scrim);
+}
+
+.help-dialog__panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  background-color: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.help-dialog__panel:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), 0 0 0 2px var(--color-accent-soft);
+}
+
+.help-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.help-dialog__title {
+  margin: 0;
+  font-size: var(--text-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.help-dialog__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-duration-base)
+    var(--transition-easing-standard);
+}
+
+.help-dialog__close:hover {
+  color: var(--color-accent-primary);
+}
+
+.help-dialog__close:focus-visible {
+  outline: none;
+  color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.help-dialog__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.help-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.help-dialog__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-dialog__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help-dialog__item-title {
+  margin: 0;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.help-dialog__item-body {
+  margin: 0;
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
+}
+
+.help-dialog__privacy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-md);
+}
+
+.help-dialog__privacy-title {
+  margin: 0;
+  font-size: var(--text-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-primary);
+}
+
+.help-dialog__privacy-body {
+  margin: 0;
+  font-size: var(--text-size-xs);
+  line-height: var(--line-height-base);
+  color: var(--color-text-secondary);
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */

@@ -3,6 +3,7 @@ import type { DragEvent } from 'react'
 import type { SourceFile } from '../core/types'
 import type { RejectedFile } from '../state/useSourceFiles'
 import { strings } from '../strings'
+import InfoTooltip from './InfoTooltip'
 
 /**
  * PDF loading surface. Accepts files by drag-and-drop or the
@@ -127,7 +128,13 @@ export default function Dropzone({
           aria-hidden="true"
           tabIndex={-1}
         />
-        <p className="dropzone__note">{strings.dropzone.privacyNote}</p>
+        <p className="dropzone__note">
+          {strings.dropzone.privacyNote}
+          {/* Feature help for the whole load surface (spec §Dropzone): drag-or-
+              pick, multi-file append order, local-only processing. Last sibling
+              of the notice so it reads as a trailing "more info" affordance. */}
+          <InfoTooltip helpKey="dropzone" />
+        </p>
       </section>
 
       {rejected.length > 0 && (
