@@ -1,5 +1,5 @@
 /**
- * Download helpers for exported PDFs (design spec S-00011 §5, "Blob 다운로드").
+ * Download helpers for exported PDFs.
  *
  * Two concerns live here, kept apart so the naming logic can be unit tested
  * without a DOM:
@@ -14,6 +14,8 @@
  * This module emits and packages bytes only; producing the merged PDF bytes is
  * `merge.ts`'s job (out of scope here).
  */
+
+import { strings } from '../strings'
 
 /** Default base name used when no usable source name is available (merge export). */
 const DEFAULT_BASE = 'merged'
@@ -47,8 +49,8 @@ function toSafeBase(rawName: string): string {
 }
 
 /**
- * Builds a deterministic file name for the merged export (design spec §2,
- * "전체 내보내기 = 병합").
+ * Builds a deterministic file name for the merged export (the "Export All"
+ * action, which merges every loaded source into a single PDF).
  *
  * The name is derived purely from the ordered source file names, so the same
  * inputs always yield the same output:
@@ -57,8 +59,8 @@ function toSafeBase(rawName: string): string {
  *   `"<fallback>.pdf"` (default `"merged.pdf"`).
  * - **One usable name** → that name with a normalized `.pdf` suffix, e.g.
  *   `"report.pdf"` or `"report"` → `"report.pdf"`.
- * - **Several usable names** → the first name plus a Korean "and N more"
- *   marker, e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-외2개.pdf"`.
+ * - **Several usable names** → the first name plus an "and N more" marker,
+ *   e.g. `["a.pdf", "b.pdf", "c.pdf"]` → `"a-and-2-more.pdf"`.
  *
  * Directory prefixes are dropped and characters unsafe in file names are
  * replaced, so the result is always a bare, safe `.pdf` file name.
@@ -82,7 +84,7 @@ export function buildExportFilename(
   } else if (bases.length === 1) {
     base = bases[0]
   } else {
-    base = `${bases[0]}-외${bases.length - 1}개`
+    base = `${bases[0]}-${strings.filename.moreSources(bases.length - 1)}`
   }
 
   return `${base}.pdf`
@@ -90,7 +92,8 @@ export function buildExportFilename(
 
 /**
  * Builds deterministic, ordered file names for a multi-part split result
- * (design spec §2, "N페이지 단위 분할 / 범위 지정 분할 → 다중 파일이면 zip").
+ * (splitting by page count or by range; when it yields several parts they are
+ * delivered together as a zip archive).
  *
  * Each part is named `"<base>-<n>.pdf"` where `n` is its 1-based position. The
  * numeric suffix is zero-padded to the width of `count`, so parts sort
@@ -136,12 +139,12 @@ export function buildSplitFilenames(
 }
 
 /**
- * Wraps any {@link Blob} in a browser download (design spec §5, "→ Blob 다운로드").
+ * Wraps any {@link Blob} in a browser download.
  *
  * A temporary object URL backs an off-DOM anchor whose `download` attribute
  * carries `filename`; the anchor is clicked to start the download and the
  * object URL is revoked afterwards so the Blob can be garbage-collected. All
- * processing stays client-side — no bytes leave the browser (design spec §1).
+ * processing stays client-side — no bytes leave the browser.
  *
  * This is the generic primitive behind {@link downloadPdf}; use it directly for
  * non-PDF payloads such as the zip `Blob` from `zipFiles`.
@@ -167,11 +170,10 @@ export function downloadBlob(blob: Blob, filename: string): void {
 }
 
 /**
- * Wraps PDF bytes in a Blob and triggers a browser download (design spec §5,
- * "→ Blob 다운로드").
+ * Wraps PDF bytes in a Blob and triggers a browser download.
  *
  * Thin `application/pdf` wrapper over {@link downloadBlob}; all processing stays
- * client-side (design spec §1).
+ * client-side.
  *
  * @param bytes The serialized PDF payload (e.g. `mergePages`' output).
  * @param filename The download file name; use {@link buildExportFilename}.

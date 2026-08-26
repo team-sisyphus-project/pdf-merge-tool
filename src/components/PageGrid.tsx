@@ -17,6 +17,7 @@ import { assignSourceColors } from '../core/source-color'
 import type { ThumbnailRenderer } from '../core/thumbnail'
 import type { SourceFile, WorkspacePage } from '../core/types'
 import PageThumbnailCard from './PageThumbnailCard'
+import { strings } from '../strings'
 import InfoTooltip from './InfoTooltip'
 
 /**
@@ -117,9 +118,9 @@ export default function PageGrid({
   if (pages.length === 0) return null
 
   return (
-    <section className="page-grid-section" aria-label="페이지 미리보기">
+    <section className="page-grid-section" aria-label={strings.pageGrid.ariaLabel}>
       <h3 className="page-grid__title">
-        페이지 {pages.length}개
+        {strings.pageGrid.title(pages.length)}
         {/* Grid-top help for drag reorder (spec §페이지 그리드 상단): dragging a
             thumbnail sets the final export order. Placed beside the grid title
             so it explains the grid as a whole, not any one card. */}

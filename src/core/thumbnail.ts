@@ -1,13 +1,13 @@
 /**
- * pdf.js-backed thumbnail rasteriser (design spec S-00011 §5).
+ * pdf.js-backed thumbnail rasteriser powering the lazy-rendered page previews.
  *
- * This is the isolation boundary for pdf.js (engineering §5: "isolate what
- * varies"). Everything that actually touches pdf.js or the DOM canvas lives
- * here; the numeric/keying logic ({@link ./thumbnail-scale}) and the load-cache
- * contract ({@link ./document-cache}) are pure, pdf.js-free, and unit tested on
- * their own. Page rasterisation is delegated to the pdf.js **worker** — merely
+ * This is the isolation boundary for pdf.js: everything that actually touches
+ * pdf.js or the DOM canvas lives here; the numeric/keying logic
+ * ({@link ./thumbnail-scale}) and the load-cache contract
+ * ({@link ./document-cache}) are pure, pdf.js-free, and unit tested on their
+ * own. Page rasterisation is delegated to the pdf.js **worker** — merely
  * setting `GlobalWorkerOptions.workerSrc` makes pdf.js parse and paint off the
- * main thread, which is what keeps the UI responsive on large files (§6).
+ * main thread, which is what keeps the UI responsive on large files.
  *
  * Node/test note: this module statically imports pdf.js and a Vite `?url`
  * asset, so it is only importable inside the browser/Vite build. Unit tests
@@ -101,7 +101,7 @@ export class ThumbnailRenderer {
    * @throws {Error} If invoked without a DOM canvas (e.g. SSR), or if pdf.js
    *         fails to parse/render the page. Errors propagate unchanged so the
    *         caller can surface the offending page without corrupting workspace
-   *         state (design spec §6).
+   *         state.
    */
   async render(request: ThumbnailRequest): Promise<Thumbnail> {
     const { sourceId, bytes, pageIndex, targetWidth } = request
@@ -166,7 +166,7 @@ export class ThumbnailRenderer {
  *
  * A *copy* of the bytes is handed to pdf.js: `getDocument` may transfer the
  * backing `ArrayBuffer` to the worker and detach it, which would corrupt the
- * original `SourceFile.bytes` that merge/split rely on (design spec §5, SSoT).
+ * original `SourceFile.bytes` that merge/split rely on (the SSoT bytes).
  */
 function loadDocument(bytes: ArrayBuffer): Promise<PDFDocumentProxy> {
   const copy = bytes.slice(0)

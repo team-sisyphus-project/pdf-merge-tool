@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { strings } from '../strings'
 import HelpDialog from './HelpDialog'
 
 /**
@@ -6,7 +7,8 @@ import HelpDialog from './HelpDialog'
  * help entry point (design spec §통합 도움말 화면 진입점).
  *
  * The badge shows the interim project code (`s00011-pdftool`) until a brand
- * name is confirmed (design spec §1).
+ * name is confirmed (design spec §1). All display copy is drawn from the central
+ * strings module.
  *
  * Help entry point (spec: 기능별 도움말 시스템, §통합 도움말 화면 / §접근성 요구):
  * - A labelled ⓘ button lives in the header's action area. It carries
@@ -56,10 +58,8 @@ export default function AppHeader() {
           </svg>
         </span>
         <div>
-          <h1 className="app-header__title">PDF 워크스페이스</h1>
-          <p className="app-header__subtitle">
-            브라우저에서 바로 처리 · 파일은 서버로 전송되지 않습니다
-          </p>
+          <h1 className="app-header__title">{strings.header.title}</h1>
+          <p className="app-header__subtitle">{strings.header.subtitle}</p>
         </div>
       </div>
 

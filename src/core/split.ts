@@ -2,15 +2,18 @@ import { PDFDocument, degrees } from 'pdf-lib'
 import type { SourceFile, WorkspacePage } from './types'
 
 /**
- * React-independent split/extract logic (design spec S-00011 §5).
+ * React-independent split/extract logic.
  *
  * Given the workspace `pages` array (the SSoT for order/rotation/deletion) and
  * the `sourceFiles` those pages reference, this module produces PDF bytes for
- * the three MVP split flows (design spec §2):
+ * three flows:
  *
- * 1. {@link extractPages} — the given selection as a *single* PDF.
- * 2. {@link splitEveryNPages} — fixed-size chunks, one PDF per chunk.
- * 3. {@link splitByRanges} — caller-supplied index groups (e.g. the output of
+ * 1. **Extract selected pages** — {@link extractPages} emits the given selection
+ *    as a *single* PDF.
+ * 2. **Split every N pages** — {@link splitEveryNPages} emits fixed-size chunks,
+ *    one PDF per chunk.
+ * 3. **Split by range** — {@link splitByRanges} emits caller-supplied index
+ *    groups (e.g. the output of
  *    `parseRange`), one PDF per group.
  *
  * All three reuse the `merge.ts` conventions: each source document is parsed
@@ -69,7 +72,7 @@ function createAssembler(sourceFiles: SourceFile[]) {
 }
 
 /**
- * Extracts the given selection into a single PDF (design spec §2, "선택 페이지만 내보내기").
+ * Extracts the given selection into a single PDF (export selected pages).
  *
  * The `pages` passed in are already the selected subset — order and rotation
  * follow the array exactly, just like {@link mergePages}. Unlike merge, an
@@ -94,7 +97,7 @@ export async function extractPages(
 }
 
 /**
- * Splits the workspace into fixed-size chunks (design spec §2, "N페이지 단위 분할").
+ * Splits the workspace into fixed-size chunks of N pages each.
  *
  * Pages are grouped in array order into consecutive chunks of `size`; the final
  * chunk holds the remainder when `pages.length` is not a multiple of `size`.
@@ -127,8 +130,7 @@ export async function splitEveryNPages(
 }
 
 /**
- * Splits the workspace by caller-supplied index groups (design spec §2,
- * "범위 지정 분할").
+ * Splits the workspace by caller-supplied index groups (split by range).
  *
  * Each entry of `ranges` is a list of 0-based positions into the `pages` array
  * — typically derived from `range-parser.ts`. Every group becomes one PDF whose

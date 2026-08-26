@@ -36,6 +36,7 @@ import {
   screen,
   within,
 } from '@testing-library/react'
+import { strings } from './strings'
 import { HELP_TEXT } from './strings/helpText'
 import type { HelpKey } from './strings/helpText'
 
@@ -112,7 +113,11 @@ async function renderAppWithPdf() {
   })
 
   // The grid is present once its count title renders (2 pages from the mock).
-  await screen.findByText('페이지 2개')
+  // Scope to the grid heading: the same "2 pages" copy also appears in the
+  // loaded-file list, so match the title element specifically.
+  await screen.findByText(strings.pageGrid.title(2), {
+    selector: '.page-grid__title',
+  })
   return utils
 }
 
