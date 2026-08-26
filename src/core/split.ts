@@ -8,9 +8,12 @@ import type { SourceFile, WorkspacePage } from './types'
  * the `sourceFiles` those pages reference, this module produces PDF bytes for
  * the three split/extract flows:
  *
- * 1. {@link extractPages} — the given selection as a *single* PDF.
- * 2. {@link splitEveryNPages} — fixed-size chunks, one PDF per chunk.
- * 3. {@link splitByRanges} — caller-supplied index groups (e.g. the output of
+ * 1. **Extract selected pages** — {@link extractPages} emits the given selection
+ *    as a *single* PDF.
+ * 2. **Split every N pages** — {@link splitEveryNPages} emits fixed-size chunks,
+ *    one PDF per chunk.
+ * 3. **Split by range** — {@link splitByRanges} emits caller-supplied index
+ *    groups (e.g. the output of
  *    `parseRange`), one PDF per group.
  *
  * All three reuse the `merge.ts` conventions: each source document is parsed

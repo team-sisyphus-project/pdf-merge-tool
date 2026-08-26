@@ -3,7 +3,8 @@
  *
  * React-independent pure logic: a string such as
  * `"1-3, 7, 10-12"` becomes a sorted, de-duplicated array of 0-based page
- * indices ready for the split/extract layer. Every failure mode a user can
+ * indices ready for the split/extract layer. Inline error copy is centralised
+ * in `src/strings.ts`. Every failure mode a user can
  * type — empty input, reversed range, out-of-range page, malformed/non-numeric
  * token — is reported as a distinct {@link RangeErrorKind} via a discriminated
  * result (same shape as {@link LoadResult} in `types.ts`), never thrown, so the
