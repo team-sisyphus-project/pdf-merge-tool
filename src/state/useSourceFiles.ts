@@ -1,8 +1,8 @@
 /**
- * `sourceFiles` state layer for the PDF workspace (design spec §5).
+ * `sourceFiles` state layer for the PDF workspace.
  *
  * Owns the identity and batch-loading rules for loaded PDFs while delegating
- * every *load judgment* (page count, encrypted vs corrupt) to the grain-1 core
+ * every *load judgment* (page count, encrypted vs corrupt) to the core
  * module. Kept deliberately thin: the pure {@link loadFiles} function does the
  * work and is unit tested without React or the DOM; the hook only holds the
  * resulting state and appends batches.
@@ -11,13 +11,13 @@ import { useCallback, useState } from 'react'
 import { loadSourceFile } from '../core/pdf-source'
 import type { LoadErrorKind, SourceFile } from '../core/types'
 
-/** A file the user tried to load that the core rejected (design spec §6). */
+/** A file the user tried to load that the core rejected. */
 export interface RejectedFile {
   /** Original file name, so the inline message can point at the offending file. */
   name: string
   /** Why it was rejected — mirrors the core {@link LoadErrorKind}. */
   kind: LoadErrorKind
-  /** Human-facing Korean message suitable for inline display. */
+  /** Human-facing message suitable for inline display. */
   message: string
 }
 
@@ -34,8 +34,8 @@ export interface LoadFilesDeps {
 }
 
 /**
- * Generates a stable id for a source file. The state layer owns identity so a
- * later grain can link pages back to their origin regardless of load order.
+ * Generates a stable id for a source file. The state layer owns identity so
+ * pages can link back to their origin regardless of load order.
  */
 export function createSourceId(): string {
   const c = (globalThis as { crypto?: Crypto }).crypto

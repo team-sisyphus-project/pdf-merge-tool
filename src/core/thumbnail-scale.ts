@@ -1,5 +1,5 @@
 /**
- * Pure geometry + keying logic for thumbnail rendering (design spec S-00011 §5).
+ * Pure geometry + keying logic for thumbnail rendering.
  *
  * Deliberately free of any pdf.js / DOM / React dependency so the numeric
  * behaviour that governs how a page is rasterised — the render scale, the
@@ -19,8 +19,8 @@ export const MIN_RENDER_SCALE = 1e-4
 /**
  * Upper bound on the render scale. Caps the canvas area regardless of the
  * requested target width, so a hostile or malformed input cannot ask for a
- * multi-gigapixel raster and exhaust memory (fail-secure; design spec §6
- * large-file guard). At 1x a page is drawn at its natural PDF-point size; 64x
+ * multi-gigapixel raster and exhaust memory (a fail-secure large-file guard).
+ * At 1x a page is drawn at its natural PDF-point size; 64x
  * is far beyond any legitimate thumbnail need.
  */
 export const MAX_RENDER_SCALE = 64

@@ -1,5 +1,6 @@
 /**
- * `pages` + selection state layer for the PDF workspace (design spec §5).
+ * `pages` + selection state layer for the PDF workspace: owns page order,
+ * rotation, deletion, and drag-reorder along with the checked-page selection.
  *
  * The `pages` array is the single source of truth (SSoT) for order, rotation,
  * and deletion. This hook owns that array plus the set of checked page ids, and

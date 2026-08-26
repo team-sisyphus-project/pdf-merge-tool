@@ -151,7 +151,7 @@
   color: var(--color-text-disabled);
 }
 
-/* Live selection count (grain-3): shows `선택 N개` while pages are checked. */
+/* Live selection count (grain-3): shows "N selected" while pages are checked. */
 .toolbar__selection {
   margin: 0;
   font-size: var(--text-size-sm);

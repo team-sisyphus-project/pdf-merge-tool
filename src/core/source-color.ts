@@ -1,6 +1,6 @@
 /**
- * Deterministic source-file → categorical colour assignment (design spec
- * S-00011 §4/§5: "출처 파일별 색 태그").
+ * Deterministic source-file → categorical colour assignment: each source PDF
+ * gets a stable colour tag so pages can be traced back to their origin file.
  *
  * Every page card in the grid shows a colour tag so the user can tell at a
  * glance which source PDF a page came from. This module is the single place
@@ -31,7 +31,8 @@ const TOKEN_PREFIX = '--color-category-'
  *
  * `slot` is the stable zero-based palette index; `token` / `cssVar` are the
  * design-token references a component drops straight into a style attribute or
- * stylesheet — the component never sees a raw hex value (오염 방지).
+ * stylesheet — the component never sees a raw hex value, which keeps raw
+ * colours from leaking into component code.
  */
 export interface SourceColor {
   /** Zero-based palette slot, always in `[0, SOURCE_COLOR_COUNT)`. */
@@ -77,8 +78,7 @@ export function sourceColorForIndex(index: number): SourceColor {
  * slot, so the assignment stays stable as duplicate references pass through and
  * the same id always resolves to the same colour for a given ordering.
  *
- * @param sourceIds Source file ids in workspace order (design spec §5
- *   `sourceFiles` order).
+ * @param sourceIds Source file ids in workspace (load) order.
  * @returns A map from source id to its resolved {@link SourceColor}.
  */
 export function assignSourceColors(

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Smoke tests for {@link Dropzone}'s load-error surface (grain-1, design spec §6).
+ * Smoke tests for {@link Dropzone}'s load-error surface.
  *
  * Covers the component's contract, not its internals: rejected files render as
  * inline messages while already-loaded files stay visible (existing state is
@@ -24,7 +24,7 @@ const REJECTED: RejectedFile[] = [
   {
     name: 'locked.pdf',
     kind: 'encrypted',
-    message: 'This PDF is password-protected. Remove the password and try again.',
+    message: 'This PDF is password protected. Remove the password and try again.',
   },
   {
     name: 'broken.pdf',
@@ -52,11 +52,11 @@ describe('Dropzone load errors', () => {
 
     expect(screen.getByText('locked.pdf')).toBeDefined()
     expect(
-      screen.getByText((t) => t.includes('password-protected')),
+      screen.getByText((t) => t.includes('Remove the password and try again')),
     ).toBeDefined()
     expect(screen.getByText('broken.pdf')).toBeDefined()
     expect(
-      screen.getByText((t) => t.includes('damaged')),
+      screen.getByText((t) => t.includes('is not a valid PDF')),
     ).toBeDefined()
   })
 

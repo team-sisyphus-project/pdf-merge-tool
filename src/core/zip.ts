@@ -1,15 +1,15 @@
 /**
- * Zip bundling for multi-file split results (design spec S-00011 §2,
- * "결과가 여러 파일이면 zip으로 묶어 다운로드").
+ * Zip bundling for multi-file split results: several output PDFs are bundled
+ * into a single downloadable zip archive.
  *
  * A split run (`splitEveryNPages` / `splitByRanges`) emits one `Uint8Array` per
  * output file. When there is more than one, the UI bundles them into a single
  * `.zip` so the user gets one download instead of many. That bundling is this
  * module's only job: it takes named byte payloads and returns a zip `Blob`.
  *
- * The heavy lifting is delegated to `client-zip` (design spec §3), a small
+ * The heavy lifting is delegated to `client-zip`, a small
  * dependency that streams a standards-compliant zip entirely in the browser —
- * no bytes leave the client (design spec §1). This layer stays pure/data-only:
+ * no bytes leave the client. This layer stays pure/data-only:
  * it produces a `Blob` and does not touch the DOM. Triggering the actual
  * download is `download.ts`'s `downloadBlob` (out of scope here).
  */
@@ -30,7 +30,7 @@ export interface ZipEntry {
  * Entry order in the archive follows the `entries` array. The result carries an
  * `application/zip` MIME type, so `downloadBlob` can hand it to the browser
  * directly. Callers that produce split filenames should use
- * `buildSplitFilenames` (design spec §2) to name the entries.
+ * `buildSplitFilenames` to name the entries.
  *
  * @param entries The files to include, in archive order. Must be non-empty —
  *   an empty zip is never a useful result, and the single-file case should be

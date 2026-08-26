@@ -1,14 +1,14 @@
 /**
  * Parses 1-based page-range strings into 0-based page indices.
  *
- * React-independent pure logic (design spec S-00011 §5): a string such as
+ * React-independent pure logic: a string such as
  * `"1-3, 7, 10-12"` becomes a sorted, de-duplicated array of 0-based page
  * indices ready for the split/extract layer. Inline error copy is centralised
  * in `src/strings.ts`. Every failure mode a user can
  * type — empty input, reversed range, out-of-range page, malformed/non-numeric
  * token — is reported as a distinct {@link RangeErrorKind} via a discriminated
  * result (same shape as {@link LoadResult} in `types.ts`), never thrown, so the
- * UI can show a single inline message and block export (design spec §6).
+ * UI can show a single inline message and block export.
  *
  * Duplicates are **not** an error: overlapping pages (e.g. `"1-3, 2"`) are
  * sorted and merged. Their presence is still surfaced — non-fatally — through
@@ -19,7 +19,7 @@ import { strings } from '../strings'
 
 /**
  * Why a range string could not be parsed. Each kind maps to exactly one class
- * of user mistake so the UI can react distinctly (design spec §6):
+ * of user mistake so the UI can react distinctly:
  * - `empty`: the input was blank or only whitespace.
  * - `invalid-token`: a token was not a positive integer or `a-b` range
  *   (non-numeric, zero, negative, decimal, or malformed like `1-` / `1-2-3`).
@@ -40,7 +40,7 @@ export type RangeNoticeKind = 'duplicate'
 
 export interface RangeError {
   kind: RangeErrorKind
-  /** Human-facing English message suitable for inline display. */
+  /** Human-facing message suitable for inline display. */
   message: string
 }
 
@@ -56,12 +56,10 @@ export type ParseRangeResult =
   | { ok: true; indices: number[]; notices: RangeNoticeKind[] }
   | { ok: false; error: RangeError }
 
-// --- Inline messages -------------------------------------------------------
-// The English copy lives in `src/strings.ts`; these thin aliases keep the
-// parsing code below readable. Tone mirrors `LoadError` in pdf-source.ts:
-// a declarative statement of the problem, then how to fix it.
-
-const { rangeError } = strings
+// --- Inline messages --------------------------------------------------------
+// User-facing copy is sourced from the central strings module so all displayed
+// text lives in one place; see `strings.errors.range`.
+const messages = strings.errors.range
 
 // --- Parsing ---------------------------------------------------------------
 
@@ -88,7 +86,7 @@ function fail(kind: RangeErrorKind, message: string): ParseRangeResult {
  */
 export function parseRange(input: string, pageCount: number): ParseRangeResult {
   if (input.trim().length === 0) {
-    return fail('empty', rangeError.empty)
+    return fail('empty', messages.empty)
   }
 
   // `seen` tracks 1-based pages to detect (and merge) duplicates; the sorted,
@@ -98,10 +96,10 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
 
   const addPage = (page: number): ParseRangeResult | null => {
     if (page < 1) {
-      return fail('invalid-token', rangeError.invalidToken(String(page)))
+      return fail('invalid-token', messages.invalidToken(String(page)))
     }
     if (page > pageCount) {
-      return fail('out-of-range', rangeError.outOfRange(page, pageCount))
+      return fail('out-of-range', messages.outOfRange(page, pageCount))
     }
     if (seen.has(page)) duplicated = true
     seen.add(page)
@@ -112,7 +110,7 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
     const token = raw.trim()
     if (token.length === 0) {
       // A stray/empty segment ("1,,3" or a trailing comma "1,") is malformed.
-      return fail('invalid-token', rangeError.invalidToken(raw))
+      return fail('invalid-token', messages.invalidToken(raw))
     }
 
     if (SINGLE.test(token)) {
@@ -127,10 +125,10 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
       const start = Number(range[1])
       const end = Number(range[2])
       if (start < 1 || end < 1) {
-        return fail('invalid-token', rangeError.invalidToken(token))
+        return fail('invalid-token', messages.invalidToken(token))
       }
       if (start > end) {
-        return fail('reversed-range', rangeError.reversedRange(start, end))
+        return fail('reversed-range', messages.reversedRange(start, end))
       }
       for (let page = start; page <= end; page++) {
         const err = addPage(page)
@@ -140,7 +138,7 @@ export function parseRange(input: string, pageCount: number): ParseRangeResult {
     }
 
     // Non-numeric, decimal, negative, or otherwise malformed (`1-`, `1-2-3`).
-    return fail('invalid-token', rangeError.invalidToken(token))
+    return fail('invalid-token', messages.invalidToken(token))
   }
 
   const indices = [...seen].sort((a, b) => a - b).map((page) => page - 1)

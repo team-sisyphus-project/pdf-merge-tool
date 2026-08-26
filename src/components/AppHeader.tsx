@@ -1,7 +1,7 @@
 /**
  * App shell header: brand mark, product title, and the working-name badge.
  * The badge shows the interim project code (`s00011-pdftool`) until a brand
- * name is confirmed. All display copy is drawn from the central strings module.
+ * name is confirmed.
  */
 import { strings } from '../strings'
 

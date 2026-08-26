@@ -6,7 +6,7 @@ import './styles/global.css'
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
-  throw new Error(strings.boot.rootMissing)
+  throw new Error(strings.console.rootElementMissing)
 }
 
 createRoot(rootElement).render(

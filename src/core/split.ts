@@ -6,7 +6,7 @@ import type { SourceFile, WorkspacePage } from './types'
  *
  * Given the workspace `pages` array (the SSoT for order/rotation/deletion) and
  * the `sourceFiles` those pages reference, this module produces PDF bytes for
- * three flows:
+ * the three split/extract flows:
  *
  * 1. **Extract selected pages** — {@link extractPages} emits the given selection
  *    as a *single* PDF.
@@ -72,7 +72,7 @@ function createAssembler(sourceFiles: SourceFile[]) {
 }
 
 /**
- * Extracts the given selection into a single PDF (export selected pages).
+ * Extracts the given selection into a single PDF (the "export selected pages" flow).
  *
  * The `pages` passed in are already the selected subset — order and rotation
  * follow the array exactly, just like {@link mergePages}. Unlike merge, an
@@ -97,7 +97,7 @@ export async function extractPages(
 }
 
 /**
- * Splits the workspace into fixed-size chunks of N pages each.
+ * Splits the workspace into fixed-size chunks (the "split by N pages" flow).
  *
  * Pages are grouped in array order into consecutive chunks of `size`; the final
  * chunk holds the remainder when `pages.length` is not a multiple of `size`.
@@ -130,7 +130,8 @@ export async function splitEveryNPages(
 }
 
 /**
- * Splits the workspace by caller-supplied index groups (split by range).
+ * Splits the workspace by caller-supplied index groups (the "split by page
+ * range" flow).
  *
  * Each entry of `ranges` is a list of 0-based positions into the `pages` array
  * — typically derived from `range-parser.ts`. Every group becomes one PDF whose
