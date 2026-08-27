@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * Smoke tests for the InfoTooltip placements the grid owns (grain-3, spec:
- * 기능별 도움말 시스템).
+ * per-feature help system).
  *
  * Two placements are covered through {@link PageGrid} because it supplies the
  * dnd-kit `DndContext`/`SortableContext` a card needs to mount:
@@ -61,10 +61,10 @@ function renderGrid(overrides: Partial<React.ComponentProps<typeof PageGrid>> = 
 
 const infoTrigger = (key: 'reorder' | 'delete') =>
   screen.getByRole('button', {
-    name: `도움말: ${HELP_TEXT[key].title}`,
+    name: `Help: ${HELP_TEXT[key].title}`,
   }) as HTMLButtonElement
 
-describe('PageGrid — 정보 아이콘(InfoTooltip)', () => {
+describe('PageGrid — info icon (InfoTooltip)', () => {
   it('renders the grid-top reorder icon and the in-card delete icon', () => {
     renderGrid()
     expect(infoTrigger('reorder')).toBeTruthy()

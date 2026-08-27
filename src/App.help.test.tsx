@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
- * Integration test for the assembled help system (design spec: 기능별 도움말
- * 시스템, §접근성 요구, Measure M-1/M-2/M-3).
+ * Integration test for the assembled help system (design spec: per-feature help
+ * system, §accessibility requirements, Measure M-1/M-2/M-3).
  *
  * The per-component contracts already have unit coverage (InfoTooltip.test.tsx,
  * HelpDialog.test.tsx, and the placement smoke tests in Toolbar/Dropzone/PageGrid
@@ -14,7 +14,7 @@
  *   exportSelected/rotate/thumbnailPreview — are surveyed only inside the unified
  *   HelpDialog, covered by HelpDialog.test.tsx, so they are out of scope here.)
  * - **M-2** the header entry point opens the unified HelpDialog, the local-only
- *   privacy notice ("…서버로 보내지 않…") is shown, and it closes via all three
+ *   privacy notice ("…never sends files to a server…") is shown, and it closes via all three
  *   documented paths: the close button, ESC, and an overlay (outside) click.
  * - **M-3** keyboard-only reachability: the header trigger is a focusable native
  *   button (so Enter/Space activate it in a browser), ESC closes the dialog and
@@ -94,7 +94,7 @@ function pdfFile(name = 'sample.pdf'): File {
 }
 
 /** The default accessible name InfoTooltip gives a trigger for `key`. */
-const infoName = (key: HelpKey) => `도움말: ${HELP_TEXT[key].title}`
+const infoName = (key: HelpKey) => `Help: ${HELP_TEXT[key].title}`
 
 /**
  * Render App and load one mock PDF so PageGrid mounts (2 pages). Returns once the
@@ -163,7 +163,7 @@ describe('App help system — M-1: placed info icons render and reveal their cop
 
 describe('App help system — M-2: unified help dialog opens, informs, and closes', () => {
   const openHelp = () => {
-    const trigger = screen.getByRole('button', { name: '도움말 열기' })
+    const trigger = screen.getByRole('button', { name: 'Open help' })
     fireEvent.click(trigger)
     return { trigger, dialog: screen.getByRole('dialog') }
   }
@@ -178,14 +178,14 @@ describe('App help system — M-2: unified help dialog opens, informs, and close
     expect(dialog.getAttribute('aria-modal')).toBe('true')
 
     // The privacy paragraph reassuring the user files are not sent to a server.
-    expect(within(dialog).getByText(/서버로 보내지 않/)).toBeTruthy()
+    expect(within(dialog).getByText(/never sends files to a server/)).toBeTruthy()
   })
 
   it('closes via the explicit close button', async () => {
     await renderAppWithPdf()
     const { dialog } = openHelp()
 
-    fireEvent.click(within(dialog).getByRole('button', { name: '도움말 닫기' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close help' }))
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
@@ -216,7 +216,7 @@ describe('App help system — M-3: keyboard-only reachability', () => {
   it('exposes the header trigger as a focusable native button (Enter/Space activatable)', async () => {
     await renderAppWithPdf()
     const trigger = screen.getByRole('button', {
-      name: '도움말 열기',
+      name: 'Open help',
     }) as HTMLButtonElement
 
     // A real <button> gets Enter/Space activation from the browser for free; the
@@ -236,7 +236,7 @@ describe('App help system — M-3: keyboard-only reachability', () => {
 
   it('moves focus into the dialog on open and traps Tab within it', async () => {
     await renderAppWithPdf()
-    fireEvent.click(screen.getByRole('button', { name: '도움말 열기' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Open help' }))
     const dialog = screen.getByRole('dialog')
 
     // Focus moved inside the dialog (the panel holds initial focus).
@@ -244,7 +244,7 @@ describe('App help system — M-3: keyboard-only reachability', () => {
 
     // Tab from the last focusable wraps to the first (here the sole close button),
     // so focus never escapes the modal.
-    const closeButton = within(dialog).getByRole('button', { name: '도움말 닫기' })
+    const closeButton = within(dialog).getByRole('button', { name: 'Close help' })
     closeButton.focus()
     fireEvent.keyDown(dialog, { key: 'Tab' })
     expect(dialog.contains(document.activeElement)).toBe(true)
@@ -258,7 +258,7 @@ describe('App help system — M-3: keyboard-only reachability', () => {
   it('closes on ESC and returns focus to the header trigger', async () => {
     await renderAppWithPdf()
     const trigger = screen.getByRole('button', {
-      name: '도움말 열기',
+      name: 'Open help',
     }) as HTMLButtonElement
 
     // Open from a focused trigger so the pre-open focus owner is the trigger.

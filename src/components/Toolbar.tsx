@@ -193,7 +193,7 @@ export default function Toolbar({
             ? strings.toolbar.exporting
             : strings.toolbar.exportSelected}
         </button>
-        {/* Explains the 전체(병합) vs 선택(추출) difference for this action group. */}
+        {/* Explains the export-all (merge) vs export-selected (extract) difference for this action group. */}
         <InfoTooltip helpKey="exportAll" />
       </div>
 

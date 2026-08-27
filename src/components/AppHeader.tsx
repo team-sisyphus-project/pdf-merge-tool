@@ -4,13 +4,13 @@ import HelpDialog from './HelpDialog'
 
 /**
  * App shell header: brand mark, product title, the working-name badge, and the
- * help entry point (design spec §통합 도움말 화면 진입점).
+ * help entry point (design spec §unified help screen entry point).
  *
  * The badge shows the interim project code (`s00011-pdftool`) until a brand
  * name is confirmed (design spec §1). All display copy is drawn from the central
  * strings module.
  *
- * Help entry point (spec: 기능별 도움말 시스템, §통합 도움말 화면 / §접근성 요구):
+ * Help entry point (spec: per-feature help system, §unified help screen / §accessibility requirements):
  * - A labelled ⓘ button lives in the header's action area. It carries
  *   `aria-haspopup="dialog"` and reflects its open state via `aria-expanded`.
  * - Clicking it (or activating with Enter/Space — it is a real `<button>`) mounts
@@ -69,7 +69,7 @@ export default function AppHeader() {
           ref={triggerRef}
           type="button"
           className="app-header__help"
-          aria-label="도움말 열기"
+          aria-label="Open help"
           aria-haspopup="dialog"
           aria-expanded={isHelpOpen}
           onClick={openHelp}

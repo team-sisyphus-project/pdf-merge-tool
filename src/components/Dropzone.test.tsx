@@ -84,13 +84,13 @@ describe('Dropzone load errors', () => {
   })
 })
 
-describe('Dropzone — 정보 아이콘(InfoTooltip)', () => {
+describe('Dropzone — info icon (InfoTooltip)', () => {
   // The load surface carries a per-feature ⓘ (helpKey="dropzone") whose default
-  // accessible name is the grain-1 `도움말: {title}`. Activation reveals that
+  // accessible name is the grain-1 `Help: {title}`. Activation reveals that
   // key's HELP_TEXT body (grain-3 DoneWhen: render + open for dropzone).
   const dropzoneTrigger = () =>
     screen.getByRole('button', {
-      name: `도움말: ${HELP_TEXT.dropzone.title}`,
+      name: `Help: ${HELP_TEXT.dropzone.title}`,
     }) as HTMLButtonElement
 
   it('renders the dropzone info icon', () => {

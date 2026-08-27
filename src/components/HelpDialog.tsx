@@ -7,7 +7,7 @@ import {
 } from '../strings/helpText'
 
 /**
- * Unified help screen (spec: 기능별 도움말 시스템, 정의 §통합 도움말 화면).
+ * Unified help screen (spec: per-feature help system, definition §unified help screen).
  *
  * A modal that surveys every feature in one place: it lists all nine feature
  * entries (iterating {@link HELP_FEATURE_KEYS} → {@link HELP_TEXT}) as a
@@ -17,7 +17,7 @@ import {
  * central {@link HELP_TEXT} source — never inlined — so the per-feature tooltips
  * and this screen stay in sync.
  *
- * Accessibility (spec §추가 사양 접근성 요구, 통합 도움말 화면):
+ * Accessibility (spec §additional accessibility requirements, unified help screen):
  * - `role="dialog"` + `aria-modal="true"` + `aria-labelledby` pointing at the
  *   heading, so assistive tech announces it as a modal named by its title.
  * - Focus moves into the dialog on open and a Tab / Shift+Tab focus trap keeps
@@ -133,12 +133,12 @@ export default function HelpDialog({ onClose }: HelpDialogProps) {
       >
         <header className="help-dialog__header">
           <h2 id={headingId} className="help-dialog__title">
-            도움말
+            Help
           </h2>
           <button
             type="button"
             className="help-dialog__close"
-            aria-label="도움말 닫기"
+            aria-label="Close help"
             onClick={onClose}
           >
             <CloseGlyph />

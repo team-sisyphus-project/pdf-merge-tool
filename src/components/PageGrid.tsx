@@ -121,7 +121,7 @@ export default function PageGrid({
     <section className="page-grid-section" aria-label={strings.pageGrid.regionLabel}>
       <h3 className="page-grid__title">
         {strings.pageGrid.title(pages.length)}
-        {/* Grid-top help for drag reorder (spec §페이지 그리드 상단): dragging a
+        {/* Grid-top help for drag reorder (spec §top of the page grid): dragging a
             thumbnail sets the final export order. Placed beside the grid title
             so it explains the grid as a whole, not any one card. */}
         <InfoTooltip helpKey="reorder" />

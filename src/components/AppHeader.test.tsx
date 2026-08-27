@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * Behaviour tests for {@link AppHeader}'s help entry point (design spec
- * §통합 도움말 화면 / §추가 사양 접근성 요구).
+ * §unified help screen / §additional accessibility requirements).
  *
  * Cover the contract this grain owns — not the dialog internals (grain-1): the
  * header exposes a labelled help button that advertises a dialog popup, opening
@@ -18,7 +18,7 @@ import { HELP_TEXT, LOCAL_PROCESSING_KEY } from '../strings/helpText'
 afterEach(cleanup)
 
 function getHelpButton() {
-  return screen.getByRole('button', { name: '도움말 열기' })
+  return screen.getByRole('button', { name: 'Open help' })
 }
 
 describe('AppHeader help entry point', () => {
@@ -52,7 +52,7 @@ describe('AppHeader help entry point', () => {
     const privacy = HELP_TEXT[LOCAL_PROCESSING_KEY]
     expect(screen.getByText(privacy.title)).toBeDefined()
     expect(screen.getByText(privacy.body)).toBeDefined()
-    expect(privacy.body).toContain('서버로 보내지 않')
+    expect(privacy.body).toContain('never sends files to a server')
   })
 
   it('returns focus to the trigger when closed via the close button', () => {
@@ -61,7 +61,7 @@ describe('AppHeader help entry point', () => {
     button.focus()
     fireEvent.click(button)
 
-    fireEvent.click(screen.getByRole('button', { name: '도움말 닫기' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close help' }))
 
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(button.getAttribute('aria-expanded')).toBe('false')

@@ -686,7 +686,7 @@
 }
 
 /* ── Info tooltip ───────────────────────────────────────────── */
-/* Per-feature ⓘ help icon + its popover (spec: 기능별 도움말 시스템). All design
+/* Per-feature ⓘ help icon + its popover (spec: per-feature help system). All design
  * values come from tokens; position/z-index and the popover max-width (an element
  * dimension, like other sized elements here) are direct implementation values. */
 .info-tooltip {
@@ -756,7 +756,7 @@
 }
 
 /* ── Help dialog ────────────────────────────────────────────── */
-/* Unified help modal (spec: 기능별 도움말 시스템, 통합 도움말 화면). All design
+/* Unified help modal (spec: per-feature help system, unified help screen). All design
  * values come from tokens; the fixed full-viewport positioning, z-index and the
  * panel's max-width / max-height (element dimensions) are implementation values. */
 .help-dialog__overlay {

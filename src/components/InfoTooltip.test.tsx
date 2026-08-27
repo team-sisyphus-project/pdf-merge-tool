@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * Behaviour tests for {@link InfoTooltip} (design spec §추가 사양 접근성 요구).
+ * Behaviour tests for {@link InfoTooltip} (design spec §additional accessibility requirements).
  *
  * Cover the component's contract, not its internals: it renders the help copy for
  * a given key, opens/closes via mouse (hover + click) and keyboard (Enter/Space/
@@ -127,7 +127,7 @@ describe('InfoTooltip', () => {
   })
 
   it('uses a custom accessible label when provided', () => {
-    render(<InfoTooltip helpKey={KEY} label="사용자 라벨" />)
-    expect(screen.getByRole('button').getAttribute('aria-label')).toBe('사용자 라벨')
+    render(<InfoTooltip helpKey={KEY} label="Custom label" />)
+    expect(screen.getByRole('button').getAttribute('aria-label')).toBe('Custom label')
   })
 })

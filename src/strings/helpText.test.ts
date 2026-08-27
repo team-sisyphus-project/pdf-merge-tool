@@ -48,24 +48,24 @@ describe('HELP_TEXT — feature-specific requirements', () => {
   })
 
   it('describes rotation as cumulative 90° steps', () => {
-    expect(HELP_TEXT.rotate.body).toContain('90도')
-    expect(HELP_TEXT.rotate.body).toContain('누적')
+    expect(HELP_TEXT.rotate.body).toContain('90 degrees')
+    expect(HELP_TEXT.rotate.body).toContain('cumulative')
   })
 
   it('describes the dropzone multi-file ordering and local-only processing', () => {
-    expect(HELP_TEXT.dropzone.body).toContain('순서')
-    expect(HELP_TEXT.dropzone.body).toContain('서버로 전송되지 않')
+    expect(HELP_TEXT.dropzone.body).toContain('order')
+    expect(HELP_TEXT.dropzone.body).toContain('never sent to a server')
   })
 
   it('states page delete cannot be undone in the workspace but the source is restorable', () => {
     // Matches analysed deletePages/reconcilePages behaviour: no in-workspace undo,
     // source file untouched, re-loading the file restores removed pages.
-    expect(HELP_TEXT.delete.body).toContain('되돌릴 수 없')
-    expect(HELP_TEXT.delete.body).toContain('다시 불러오면')
+    expect(HELP_TEXT.delete.body).toContain('cannot be undone')
+    expect(HELP_TEXT.delete.body).toContain('re-loading')
   })
 
   it('states the local-processing notice: files are never sent to a server', () => {
-    expect(HELP_TEXT.localProcessing.body).toContain('서버로 보내지 않')
-    expect(HELP_TEXT.localProcessing.body).toContain('브라우저')
+    expect(HELP_TEXT.localProcessing.body).toContain('never sends files to a server')
+    expect(HELP_TEXT.localProcessing.body).toContain('browser')
   })
 })

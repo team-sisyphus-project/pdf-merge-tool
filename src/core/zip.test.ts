@@ -53,10 +53,10 @@ describe('zipFiles — archive shape', () => {
     expect(names).toEqual(['only.pdf'])
   })
 
-  it('keeps non-ASCII (Korean) entry names intact', async () => {
-    const blob = await zipFiles([{ name: '보고서-1.pdf', bytes: bytesOf('x') }])
+  it('keeps non-ASCII (UTF-8) entry names intact', async () => {
+    const blob = await zipFiles([{ name: 'résumé-1.pdf', bytes: bytesOf('x') }])
     const names = readZipEntryNames(await blob.arrayBuffer())
-    expect(names).toEqual(['보고서-1.pdf'])
+    expect(names).toEqual(['résumé-1.pdf'])
   })
 })
 

@@ -291,8 +291,8 @@ export default function PageThumbnailCard({
           >
             <TrashIcon />
           </button>
-          {/* One tooltip explains both rotate (누적 90°) and delete (작업 화면
-              한정, 되돌리기 불가) — it sits inside `.page-card__actions`, so the
+          {/* One tooltip explains both rotate (cumulative 90°) and delete (workspace-only,
+              cannot be undone) — it sits inside `.page-card__actions`, so the
               container's `stopDragGesture` guard already keeps the ⓘ from
               starting a drag (no separate handler needed). */}
           <InfoTooltip helpKey="delete" />

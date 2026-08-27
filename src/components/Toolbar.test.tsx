@@ -200,15 +200,15 @@ describe('Toolbar — Split by range', () => {
   })
 })
 
-describe('Toolbar — 정보 아이콘(InfoTooltip) 배치', () => {
+describe('Toolbar — info icon (InfoTooltip) placement', () => {
   // Each toolbar feature carries a per-feature ⓘ whose accessible name is the
-  // grain-1 default `도움말: {title}`. Activation must reveal that key's HELP_TEXT
+  // grain-1 default `Help: {title}`. Activation must reveal that key's HELP_TEXT
   // body (grain-2 DoneWhen: exportAll/splitByCount/splitByRange render + open).
   const TOOLBAR_HELP_KEYS = ['exportAll', 'splitByCount', 'splitByRange'] as const
 
   const infoTrigger = (key: (typeof TOOLBAR_HELP_KEYS)[number]) =>
     screen.getByRole('button', {
-      name: `도움말: ${HELP_TEXT[key].title}`,
+      name: `Help: ${HELP_TEXT[key].title}`,
     }) as HTMLButtonElement
 
   it('renders exactly the three toolbar info icons', () => {

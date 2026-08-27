@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
- * Behaviour tests for {@link HelpDialog} (design spec §추가 사양 접근성 요구,
- * 통합 도움말 화면).
+ * Behaviour tests for {@link HelpDialog} (design spec §additional accessibility requirements,
+ * unified help screen).
  *
  * Cover the component's contract, not its internals: it renders every feature's
  * help copy plus the local-processing notice, exposes dialog semantics, closes
@@ -45,7 +45,7 @@ describe('HelpDialog', () => {
     expect(screen.getByText(title)).toBeDefined()
     expect(screen.getByText(body)).toBeDefined()
     // The notice mentions files are not sent to a server.
-    expect(body).toContain('서버로 보내지 않')
+    expect(body).toContain('never sends files to a server')
   })
 
   it('exposes dialog semantics: role, aria-modal, and a labelling heading', () => {
@@ -56,13 +56,13 @@ describe('HelpDialog', () => {
     expect(labelledBy).toBeTruthy()
     const heading = document.getElementById(labelledBy as string)
     expect(heading).not.toBeNull()
-    expect(heading?.textContent).toBe('도움말')
+    expect(heading?.textContent).toBe('Help')
   })
 
   it('closes via the explicit close button', () => {
     const { onClose } = renderDialog()
 
-    fireEvent.click(screen.getByRole('button', { name: '도움말 닫기' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close help' }))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
@@ -94,7 +94,7 @@ describe('HelpDialog', () => {
 
   it('traps Tab and Shift+Tab within the dialog, wrapping at the edges', () => {
     const { dialog } = renderDialog()
-    const closeButton = screen.getByRole('button', { name: '도움말 닫기' })
+    const closeButton = screen.getByRole('button', { name: 'Close help' })
 
     // Tab from the last focusable wraps to the first (here the sole control).
     closeButton.focus()

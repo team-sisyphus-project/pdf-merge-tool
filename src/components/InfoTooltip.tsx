@@ -4,14 +4,14 @@ import { HELP_TEXT } from '../strings/helpText'
 import type { HelpKey } from '../strings/helpText'
 
 /**
- * Accessible per-feature info icon (spec: 기능별 도움말 시스템, 정의 §정보 아이콘).
+ * Accessible per-feature info icon (spec: per-feature help system, definition §info icon).
  *
  * A small ⓘ trigger placed next to a feature; hovering or activating it reveals a
  * popover with that one feature's help copy. The copy is never inlined — it is
  * read by key from the central {@link HELP_TEXT} source so the per-feature
  * tooltips and the later unified help screen stay in sync.
  *
- * Accessibility (spec §추가 사양 접근성 요구):
+ * Accessibility (spec §additional accessibility requirements):
  * - The trigger is a real `<button>`: Tab-focusable, and Enter/Space open it.
  * - `aria-expanded` on the trigger tells assistive tech the open state.
  * - While open, `aria-describedby` links the trigger to the popover (`role=
@@ -26,7 +26,7 @@ export interface InfoTooltipProps {
   helpKey: HelpKey
   /**
    * Optional override for the trigger's accessible name. Defaults to
-   * `"도움말: {title}"` so screen-reader users hear which feature it explains.
+   * `"Help: {title}"` so screen-reader users hear which feature it explains.
    */
   label?: string
   /** Extra class(es) appended to the wrapper, for placement by host components. */
@@ -112,7 +112,7 @@ export default function InfoTooltip({ helpKey, label, className }: InfoTooltipPr
       <button
         type="button"
         className="info-tooltip__trigger"
-        aria-label={label ?? `도움말: ${title}`}
+        aria-label={label ?? `Help: ${title}`}
         aria-expanded={isOpen}
         aria-describedby={isOpen ? popoverId : undefined}
         onClick={() => setPinned((prev) => !prev)}
