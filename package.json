@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "start": "serve --no-clipboard -s dist -l tcp://0.0.0.0:${PORT}",
     "test": "vitest run"
   },
   "dependencies": {
@@ -17,7 +18,8 @@
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.10.38",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "serve": "14.2.6"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",

@@ -92,9 +92,10 @@ empty workspace screen.
 
 ```bash
 npm run build    # type check (tsc -b) + static build → dist/
-npm run preview  # locally preview the build output
+PORT=4173 npm start  # serve dist/ on 0.0.0.0:$PORT
 ```
 
-`npm run build` produces the static output in `dist/`, and `npm run preview`
-serves it locally. The preview runtime detects and serves `dist/`
-automatically.
+`npm run build` produces the static output in `dist/`. The production server
+requires `PORT`, binds on all interfaces, and serves the single-page app from
+`dist/`. The deployment container runs as a non-root user with a read-only
+application filesystem; this app does not write files at runtime.

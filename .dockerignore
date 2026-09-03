@@ -1,0 +1,14 @@
+.git
+.gitignore
+.charlie
+.charlie-design-system
+node_modules
+dist
+build
+out
+coverage
+.env
+.env.*
+*.log
+*.tmp
+*.tsbuildinfo
