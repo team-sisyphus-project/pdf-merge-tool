@@ -13,9 +13,3 @@ Out-of-scope findings recorded during grain work. Not fixed here.
   would cut first-paint bytes.
 - `npm ci` reports 3 advisories (1 moderate, 2 high) in the dependency tree.
   Needs a triage pass before release.
-
-## Documentation
-
-- `README.md` "Current status" still says only the empty workspace screen is
-  implemented, while `src/` now carries merge/split/page-editing. The section
-  needs a refresh from whoever owns the feature docs.

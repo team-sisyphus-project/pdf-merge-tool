@@ -27,8 +27,9 @@ host) is all it takes to run, and the build output goes to Vite's default
 
 ## Current status
 
-The empty workspace screen (app shell + empty dropzone state) is implemented.
-The MVP features below are follow-up work scoped after the design is finalized.
+The workspace screen and the MVP feature set below are implemented and covered
+by unit tests. Everything runs in the browser: there is no server component, no
+database, and no account system.
 
 ## MVP scope
 
@@ -76,39 +77,38 @@ platforms (`< > : " | ? *`).
 
 ## Running locally (green-field)
 
-There is no database, seed data, or migration — this is a pure static
-frontend. Starting from a completely unconfigured state, the steps below are
-all it takes to get the empty workspace running.
+This is a pure client-side static frontend. There is **no database, no
+migration, no seed data, and no dummy account or credential** — nothing to
+provision before the first run, and no environment variables or secrets to
+supply. Starting from a clean checkout, these two commands are all it takes:
 
 ```bash
 npm ci           # install dependencies exactly as locked (npm install also works)
 npm run dev      # dev server (Vite, default http://localhost:5173)
 ```
 
-Once the dev server is up, open the printed address in a browser to see the
-empty workspace screen.
+Open the address the dev server prints to use the workspace.
 
 ## Production build / preview
 
 ```bash
 npm run build    # type check (tsc -b) + static build → dist/
-npm run preview  # locally preview the build output
+npm run preview  # serve the build output locally
 ```
 
-`npm run build` produces the static output in `dist/`, and `npm run preview`
-serves it locally.
+`npm run build` writes the static output to `dist/`, and `npm run preview`
+serves that output so you can check the real bundle before shipping.
 
 The preview runtime detects and serves `dist/` automatically, so there is no
 `preview.toml` in this repository: the app sits at the repo root, `vite` is a
-dependency, the standard `build` script is present, and the output directory
-is left at Vite's default `dist/`. That is the documented build-to-static
-detection path — build with `npm run build`, serve `dist/`. If the app ever
-moves into a subdirectory, renames its `build` script, changes `build.outDir`,
-gains a server process, or starts requiring env keys, add a `preview.toml`
-declaring the new shape (see `context/decisions/2026-09-06-no-preview-toml.md`).
+dependency, the standard `build` script is present, and the output directory is
+left at Vite's default `dist/`. That is the documented build-to-static detection
+path — build with `npm run build`, serve `dist/`. If the app ever moves into a
+subdirectory, renames its `build` script, changes `build.outDir`, gains a server
+process, or starts requiring env keys, add a `preview.toml` declaring the new
+shape (see `context/decisions/2026-09-06-no-preview-toml.md`).
 
 Assets are referenced with document-relative URLs (`./assets/...`, set via
 `base: './'` in `vite.config.ts`), so `dist/` serves correctly over plain HTTP
-whether it is mounted at the domain root or under a sub-path behind the
-reverse proxy. There are no environment variables, secrets, migrations, or
-seed data: the app is a pure client-side static bundle.
+whether it is mounted at the domain root or under a sub-path behind the reverse
+proxy.
