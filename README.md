@@ -96,8 +96,16 @@ npm run preview  # locally preview the build output
 ```
 
 `npm run build` produces the static output in `dist/`, and `npm run preview`
-serves it locally. The preview runtime detects and serves `dist/`
-automatically.
+serves it locally.
+
+The preview runtime detects and serves `dist/` automatically, so there is no
+`preview.toml` in this repository: the app sits at the repo root, `vite` is a
+dependency, the standard `build` script is present, and the output directory
+is left at Vite's default `dist/`. That is the documented build-to-static
+detection path — build with `npm run build`, serve `dist/`. If the app ever
+moves into a subdirectory, renames its `build` script, changes `build.outDir`,
+gains a server process, or starts requiring env keys, add a `preview.toml`
+declaring the new shape (see `context/decisions/2026-09-06-no-preview-toml.md`).
 
 Assets are referenced with document-relative URLs (`./assets/...`, set via
 `base: './'` in `vite.config.ts`), so `dist/` serves correctly over plain HTTP
