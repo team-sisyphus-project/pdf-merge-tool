@@ -81,7 +81,7 @@ frontend. Starting from a completely unconfigured state, the steps below are
 all it takes to get the empty workspace running.
 
 ```bash
-npm install      # install dependencies
+npm ci           # install dependencies exactly as locked (npm install also works)
 npm run dev      # dev server (Vite, default http://localhost:5173)
 ```
 
@@ -98,3 +98,9 @@ npm run preview  # locally preview the build output
 `npm run build` produces the static output in `dist/`, and `npm run preview`
 serves it locally. The preview runtime detects and serves `dist/`
 automatically.
+
+Assets are referenced with document-relative URLs (`./assets/...`, set via
+`base: './'` in `vite.config.ts`), so `dist/` serves correctly over plain HTTP
+whether it is mounted at the domain root or under a sub-path behind the
+reverse proxy. There are no environment variables, secrets, migrations, or
+seed data: the app is a pure client-side static bundle.
